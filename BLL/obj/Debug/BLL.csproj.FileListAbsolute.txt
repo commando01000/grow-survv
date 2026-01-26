@@ -1,0 +1,17 @@
+H:\projects\Web\svn_grow\bitbuket\BLL\bin\Debug\BLL.dll
+H:\projects\Web\svn_grow\bitbuket\BLL\bin\Debug\BLL.pdb
+H:\projects\Web\svn_grow\bitbuket\BLL\bin\Debug\DAL.dll
+H:\projects\Web\svn_grow\bitbuket\BLL\bin\Debug\DAL.pdb
+H:\projects\Web\svn_grow\bitbuket\BLL\obj\Debug\BLL.csprojResolveAssemblyReference.cache
+H:\projects\Web\svn_grow\bitbuket\BLL\obj\Debug\BLL.dll
+H:\projects\Web\svn_grow\bitbuket\BLL\obj\Debug\BLL.pdb
+H:\projects\Web\svn_grow\bitbuket\BLL\bin\Debug\MyGeneration.dOOdads.dll
+E:\pc\source\repos\grow-surv\BLL\bin\Debug\BLL.dll
+E:\pc\source\repos\grow-surv\BLL\bin\Debug\BLL.pdb
+E:\pc\source\repos\grow-surv\BLL\bin\Debug\DAL.dll
+E:\pc\source\repos\grow-surv\BLL\bin\Debug\DAL.pdb
+E:\pc\source\repos\grow-surv\BLL\obj\Debug\BLL.csproj.AssemblyReference.cache
+E:\pc\source\repos\grow-surv\BLL\obj\Debug\BLL.csproj.CoreCompileInputs.cache
+E:\pc\source\repos\grow-surv\BLL\obj\Debug\BLL.csproj.Up2Date
+E:\pc\source\repos\grow-surv\BLL\obj\Debug\BLL.dll
+E:\pc\source\repos\grow-surv\BLL\obj\Debug\BLL.pdb
