@@ -1,8 +1,0 @@
-H:\projects\Web\svn_grow\bitbuket\BLL\bin\Release\BLL.dll
-H:\projects\Web\svn_grow\bitbuket\BLL\bin\Release\BLL.pdb
-H:\projects\Web\svn_grow\bitbuket\BLL\bin\Release\DAL.dll
-H:\projects\Web\svn_grow\bitbuket\BLL\bin\Release\MyGeneration.dOOdads.dll
-H:\projects\Web\svn_grow\bitbuket\BLL\bin\Release\DAL.pdb
-H:\projects\Web\svn_grow\bitbuket\BLL\obj\Release\BLL.csprojResolveAssemblyReference.cache
-H:\projects\Web\svn_grow\bitbuket\BLL\obj\Release\BLL.dll
-H:\projects\Web\svn_grow\bitbuket\BLL\obj\Release\BLL.pdb

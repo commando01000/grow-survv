@@ -1,6 +1,0 @@
-H:\projects\Web\svn_grow\bitbuket\DAL\bin\Release\DAL.dll
-H:\projects\Web\svn_grow\bitbuket\DAL\bin\Release\DAL.pdb
-H:\projects\Web\svn_grow\bitbuket\DAL\bin\Release\MyGeneration.dOOdads.dll
-H:\projects\Web\svn_grow\bitbuket\DAL\obj\Release\DAL.csprojResolveAssemblyReference.cache
-H:\projects\Web\svn_grow\bitbuket\DAL\obj\Release\DAL.dll
-H:\projects\Web\svn_grow\bitbuket\DAL\obj\Release\DAL.pdb
