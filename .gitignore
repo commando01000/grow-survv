@@ -1,3 +1,18 @@
 /GrowSurv/scripts/SurveyManager.js.bak
 /GrowSurv/survManager/doreport.aspx.cs.bak
 /GrowSurv/survManager/ListSurveys.aspx.bak
+
+# Visual Studio
+.vs/
+
+# Build outputs
+bin/
+obj/
+
+# User-specific
+*.user
+*.suo
+
+# Cache / index
+FileContentIndex/
+*.vsidx
