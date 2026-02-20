@@ -34,7 +34,7 @@ namespace GrowSurv.common
         // === Static SMTP Settings (TEMP) ===
         // ⚠️ Do NOT commit real password to git.
         private static readonly string SmtpHost = "mail.tedorcg.com"; // put the REAL host here
-        private static readonly int SmtpPort = 587;                  // prefer 587
+        private static readonly int SmtpPort = 465;
         private static readonly bool SmtpEnableSsl = true;
 
         private static readonly string SmtpUser = "Survey@tedorcg.com";
