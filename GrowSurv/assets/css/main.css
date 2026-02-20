@@ -318,6 +318,8 @@ header .scrolldown {
     border-color: #fff;
     color: #5480dd;
     text-decoration: none;
+    z-index: 99999 !important;
+    position: relative;
 }
 
     .header-account a:not(:last-child) {
@@ -337,7 +339,7 @@ header .scrolldown {
     display: inline-block;
     margin-right: 10px;
     top: -3px;
-    width:45px;
+    width: 45px;
 }
 
 .navbar-toggler {
@@ -2520,8 +2522,12 @@ footer h1 {
 
 
 /*Responsives - $responsives*/
+/* ===============================
+   RESPONSIVES - CLEAN VERSION
+   =============================== */
 
-@media(max-width: 1640px) {
+/* ---------- <= 1640px ---------- */
+@media (max-width: 1640px) {
     .extend-wrap {
         margin-right: 0;
         margin-left: 0;
@@ -2544,7 +2550,8 @@ footer h1 {
         }
 }
 
-@media(max-width: 1250px) {
+/* ---------- <= 1250px ---------- */
+@media (max-width: 1250px) {
     .footer-contact,
     .signup h3 {
         white-space: normal;
@@ -2564,7 +2571,7 @@ footer h1 {
         }
 
     nav ul li i {
-        right: 10px
+        right: 10px;
     }
 
     nav li > a {
@@ -2572,12 +2579,83 @@ footer h1 {
     }
 }
 
-@media(max-width: 992px) {
+/* ---------- <= 992px (TABLET/MOBILE) ---------- */
+/* Goal: Keep login + centered logo, hide nav/hamburger/dropdowns completely */
+@media (max-width: 992px) {
 
-    header h2 {
-        padding: 0;
+    /* Topbar layout */
+    #topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        line-height: normal;
+        padding: 15px 0;
+        position: relative;
+        z-index: 1000;
     }
 
+        /* If bootstrap floats exist */
+        #topbar .pull-left,
+        #topbar .pull-right {
+            float: none !important;
+        }
+
+    /* Login stays clickable */
+    .header-account {
+        flex: 0 0 auto;
+        position: relative;
+        z-index: 999999 !important;
+    }
+
+        .header-account a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+    /* Center the logo */
+    .logo {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        max-width: none;
+    }
+
+    /* Hide NAV completely */
+    nav.navbar,
+    .navbar-collapse,
+    .navbar-toggler,
+    .submenu,
+    nav ul li i {
+        display: none !important;
+    }
+
+        /* Safety: if nav overlays anything */
+        .navbar-collapse.collapse.show {
+            display: none !important;
+        }
+
+    /* Remove desktop header spacing issues */
+    header h2 {
+        padding: 0;
+        white-space: normal;
+    }
+
+    header.homepage:before {
+        content: none;
+    }
+
+    header .scrolldown {
+        display: none;
+    }
+
+    /* Keep other existing 992px layout tweaks */
     footer .col-12 {
         text-align: center;
         margin-bottom: 40px;
@@ -2619,80 +2697,10 @@ footer h1 {
         margin-top: 30px;
         margin-bottom: 30px;
     }
-
-    .navbar-collapse > ul li {
-        display: block;
-    }
-
-    .navbar-collapse {
-        max-height: 1000px;
-        transition: all 0.7s ease;
-    }
-
-    .navbar-collapse {
-        margin-bottom: 10px;
-    }
-
-        .navbar-collapse.collapse {
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.7s ease;
-        }
-
-    .navbar-toggler {
-        display: block;
-    }
-
-        .navbar-toggler.clicked {
-            background-color: rgba(255,255,255,0.5);
-        }
-
-    .navbar-collapse > ul > li > a.selected + .submenu {
-        opacity: 1;
-        z-index: 99;
-        transition: all 0.3s ease;
-    }
-
-    .navbar-collapse > ul > li:hover .submenu {
-        opacity: -1;
-        z-index: 0;
-    }
-
-    nav {
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-        top: -60px;
-    }
-
-    .submenu {
-        right: 0;
-    }
-
-        .submenu li {
-            float: none;
-        }
-
-    .navbar-collapse > ul {
-        background-color: rgba(255,255,255,0.3);
-        width: 300px;
-    }
-
-    nav ul li i {
-        right: 40%
-    }
-
-    header.homepage:before {
-        content: none;
-    }
-
-    header .scrolldown {
-        display: none;
-    }
 }
 
-@media(max-width: 768px) {
-
+/* ---------- <= 768px ---------- */
+@media (max-width: 768px) {
     header .header-slick {
         display: none;
     }
@@ -2715,7 +2723,8 @@ footer h1 {
     }
 }
 
-@media(max-width: 576px) {
+/* ---------- <= 576px ---------- */
+@media (max-width: 576px) {
     .pricings .col-lg-3 .pricing-plan {
         border-left: 1px solid #e2ebf1;
         border-top-left-radius: 12px;
@@ -2728,40 +2737,13 @@ footer h1 {
         border-bottom-right-radius: 12px;
     }
 }
-
-
-/*Cool visuals - $visuals*/
-
-.drag-up {
-    transform: translateY(150px);
-    animation: drag-up 0.8s ease forwards;
-}
-
-@keyframes drag-up {
-    to {
-        transform: translateY(0);
+/* ---------- OVERRIDDING THE CSS FILES ---------- */
+@media (max-width: 992px) {
+    .navbar-toggler {
+        display: none !important;
     }
-}
 
-
-.drag-left {
-    transform: translateX(-150px);
-    animation: drag-left 0.8s ease forwards;
-}
-
-@keyframes drag-left {
-    to {
-        transform: translateX(0);
-    }
-}
-
-.drag-right {
-    transform: translateX(150px);
-    animation: drag-right 0.8s ease forwards;
-}
-
-@keyframes drag-right {
-    to {
-        transform: translateX(0);
+    nav.navbar {
+        display: none !important;
     }
 }
