@@ -31,6 +31,18 @@ namespace GrowSurv.common
             return "Hello World";
         }
 
+        // === Static SMTP Settings (TEMP) ===
+        // ⚠️ Do NOT commit real password to git.
+        private static readonly string SmtpHost = "mail.tedorcg.com"; // put the REAL host here
+        private static readonly int SmtpPort = 587;                  // prefer 587
+        private static readonly bool SmtpEnableSsl = true;
+
+        private static readonly string SmtpUser = "Survey@tedorcg.com";
+        private static readonly string SmtpPass = "Tedorcg@01222468078"; // insert locally
+
+        private static readonly string FromEmail = "Survey@tedorcg.com";
+        private static readonly string SurveyBaseUrl = "http://grewsur.tedorcg.com/doSurvey/index.aspx";
+
         #region Survey Functions
         [WebMethod]
         public void SearchSurveies(string filtertxt, int CompanyID)
@@ -63,16 +75,16 @@ namespace GrowSurv.common
                     IsRecentPromotionDateMandatory = survs.IsColumnNull("IsRecentPromotionDateMandatory") ? false : survs.IsRecentPromotionDateMandatory,
                     IsGovernrateMandatory = survs.IsColumnNull("IsGovernrateMandatory") ? false : survs.IsGovernrateMandatory,
                     IsCountryMandatory = survs.IsColumnNull("IsCountryMandatory") ? false : survs.IsCountryMandatory,
-                    IsPublic= survs.IsColumnNull("IsPublic") ? false : survs.IsPublic,
+                    IsPublic = survs.IsColumnNull("IsPublic") ? false : survs.IsPublic,
                     EnHeader = survs.EnHeader,
                     ArHeader = survs.ArHeader,
                     EnFooter = survs.EnFooter,
                     ArFooter = survs.ArFooter,
-					EmailSubject = survs.EmailSubject,
+                    EmailSubject = survs.EmailSubject,
                     EmailBody = survs.EmailBody,
                     ArEmailBody = survs.ArEmailBody,
                     SkipDemographicPage = survs.IsColumnNull("SkipDemographicPage") ? false : survs.SkipDemographicPage,
-                    PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://growsurv.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
+                    PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://grewsur.tedorcg.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
                 });
                 survs.MoveNext();
             }
@@ -109,18 +121,18 @@ namespace GrowSurv.common
                 IsRecentPromotionDateMandatory = survs.IsColumnNull("IsRecentPromotionDateMandatory") ? false : survs.IsRecentPromotionDateMandatory,
                 SurveyTypeID = survs.IsColumnNull("SurveyTypeID") ? 1 : survs.SurveyTypeID,
                 Duration = survs.IsColumnNull("Duration") ? DateTime.MinValue : survs.Duration,
-                IsGovernrateMandatory= survs.IsColumnNull("IsGovernrateMandatory") ? false : survs.IsGovernrateMandatory,
+                IsGovernrateMandatory = survs.IsColumnNull("IsGovernrateMandatory") ? false : survs.IsGovernrateMandatory,
                 IsCountryMandatory = survs.IsColumnNull("IsCountryMandatory") ? false : survs.IsCountryMandatory,
                 IsPublic = survs.IsColumnNull("IsPublic") ? false : survs.IsPublic,
                 EnHeader = survs.EnHeader,
                 ArHeader = survs.ArHeader,
-                EnFooter= survs.EnFooter,
+                EnFooter = survs.EnFooter,
                 ArFooter = survs.ArFooter,
-				EmailSubject = survs.EmailSubject,
+                EmailSubject = survs.EmailSubject,
                 EmailBody = survs.EmailBody,
                 ArEmailBody = survs.ArEmailBody,
                 SkipDemographicPage = survs.IsColumnNull("SkipDemographicPage") ? false : survs.SkipDemographicPage,
-                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://growsurv.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
+                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://grewsur.tedorcg.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
             });
 
 
@@ -212,81 +224,132 @@ namespace GrowSurv.common
                 EmailBody = survs.EmailBody,
                 ArEmailBody = survs.ArEmailBody,
                 SkipDemographicPage = survs.IsColumnNull("SkipDemographicPage") ? false : survs.SkipDemographicPage,
-                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://growsurv.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
+                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://grewsur.tedorcg.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
             };
             SetContentResult(tempSurvey);
         }
 
         [WebMethod]
         public void PublishSurvey(int SurveyID)
-        {            
+        {
             SurveyMember members = new SurveyMember();
             members.GetListBySurveyID(SurveyID);
-            string surveyId = HttpUtility.UrlEncode(Encrypt(SurveyID.ToString()));
-            string email = "";
-			Survey mainSurvey = new Survey();
+
+            Survey mainSurvey = new Survey();
             mainSurvey.LoadByPrimaryKey(SurveyID);
+
+            string sid = HttpUtility.UrlEncode(Encrypt(SurveyID.ToString()));
+            bool allOk = true;
+
             for (int i = 0; i < members.RowCount; i++)
             {
-                if (IsValidEmail(members.MemberEmail))
+                try
                 {
-                    email = HttpUtility.UrlEncode(Encrypt(members.MemberEmail));
-                    MailMessage msg = new MailMessage();
-                    msg.From = new MailAddress("publish@growsurv.com");
-                    msg.Subject = mainSurvey.EmailSubject;
-                    msg.IsBodyHtml = true;
-                    msg.BodyEncoding = System.Text.Encoding.UTF8;
+                    var to = members.MemberEmail;
 
-                    SmtpClient client = new SmtpClient("mail.growsurv.com", 25);                    
-                    client.EnableSsl = false;
-                    client.UseDefaultCredentials = false;
-                    client.Credentials = new System.Net.NetworkCredential("publish@growsurv.com", "Jco1d#44");
-                    msg.To.Clear();
-                    msg.To.Add(members.MemberEmail);
-                    //msg.Body = "http://localhost:21455/doSurvey/index.aspx?sid=" + surveyId + "&mail=" + email;
-                    msg.Body = string.Format(HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(), mainSurvey.EmailBody, mainSurvey.ArEmailBody, "http://growsurv.com/doSurvey/index.aspx?sid=" + surveyId + "&mail=" + email);
-                    
-                    client.Send(msg);
+                    if (IsValidEmail(to))
+                    {
+                        string mail = HttpUtility.UrlEncode(Encrypt(to));
+                        string link = $"{SurveyBaseUrl}?sid={sid}&mail={mail}";
 
+                        using (var msg = new MailMessage())
+                        {
+                            msg.From = new MailAddress(FromEmail);
+                            msg.Subject = mainSurvey.EmailSubject ?? string.Empty;
+                            msg.IsBodyHtml = true;
+                            msg.BodyEncoding = System.Text.Encoding.UTF8;
+                            msg.To.Add(to);
+
+                            msg.Body = string.Format(
+                                HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(),
+                                mainSurvey.EmailBody,
+                                mainSurvey.ArEmailBody,
+                                link
+                            );
+
+                            using (var client = new SmtpClient(SmtpHost, SmtpPort))
+                            {
+                                client.EnableSsl = SmtpEnableSsl;
+                                client.UseDefaultCredentials = false;
+                                client.Credentials = new System.Net.NetworkCredential(SmtpUser, SmtpPass);
+
+                                client.Send(msg);
+                            }
+                        }
+                    }
                 }
-                members.MoveNext();
+                catch
+                {
+                    // TODO: log exception details somewhere (db/eventlog/file)
+                    allOk = false;
+                }
+                finally
+                {
+                    members.MoveNext();
+                }
             }
-            SetContentResult(true);
+
+            SetContentResult(allOk);
         }
 
         [WebMethod]
         public void SendEmailForAMember(int memberID, int surveyID)
         {
-            SurveyMember members = new SurveyMember();
-            members.LoadByPrimaryKey(memberID);
-            string surveyId = HttpUtility.UrlEncode(Encrypt(surveyID.ToString()));
-            Survey mainSurvey = new Survey();
-            mainSurvey.LoadByPrimaryKey(surveyID);
-            string email = "";
-            if (IsValidEmail(members.MemberEmail))
+            try
             {
-                email = HttpUtility.UrlEncode(Encrypt(members.MemberEmail));
-                MailMessage msg = new MailMessage();
-                msg.From = new MailAddress("publish@growsurv.com");
-                msg.Subject = mainSurvey.EmailSubject;
-                msg.IsBodyHtml = true;
-                msg.BodyEncoding = System.Text.Encoding.UTF8;
+                SurveyMember member = new SurveyMember();
+                member.LoadByPrimaryKey(memberID);
 
-                SmtpClient client = new SmtpClient("mail.growsurv.com", 25);
-                client.EnableSsl = false;
-                client.UseDefaultCredentials = false;
-                client.Credentials = new System.Net.NetworkCredential("publish@growsurv.com", "Jco1d#44");
-                msg.To.Clear();
-                msg.To.Add(members.MemberEmail);                
-                //msg.Body = "http://localhost:21455/doSurvey/index.aspx?sid=" + surveyId + "&mail=" + email;
-                msg.Body = string.Format(HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(), mainSurvey.EmailBody, mainSurvey.ArEmailBody, "http://growsurv.com/doSurvey/index.aspx?sid=" + surveyId + "&mail=" + email);
-                client.Send(msg);
+                if (!IsValidEmail(member.MemberEmail))
+                {
+                    SetContentResult(false);
+                    return;
+                }
 
+                Survey mainSurvey = new Survey();
+                mainSurvey.LoadByPrimaryKey(surveyID);
+
+                string sid = HttpUtility.UrlEncode(Encrypt(surveyID.ToString()));
+                string mail = HttpUtility.UrlEncode(Encrypt(member.MemberEmail));
+                string link = $"{SurveyBaseUrl}?sid={sid}&mail={mail}";
+
+                using (var msg = new MailMessage())
+                {
+                    msg.From = new MailAddress(FromEmail);
+                    msg.Subject = mainSurvey.EmailSubject ?? string.Empty;
+                    msg.IsBodyHtml = true;
+                    msg.BodyEncoding = System.Text.Encoding.UTF8;
+                    msg.To.Add(member.MemberEmail);
+
+                    msg.Body = string.Format(
+                        HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(),
+                        mainSurvey.EmailBody,
+                        mainSurvey.ArEmailBody,
+                        link
+                    );
+
+                    using (var client = new SmtpClient(SmtpHost, SmtpPort))
+                    {
+                        client.EnableSsl = SmtpEnableSsl;
+                        client.UseDefaultCredentials = false;
+                        client.Credentials = new System.Net.NetworkCredential(SmtpUser, SmtpPass);
+
+                        client.Send(msg);
+                    }
+                }
+
+                SetContentResult(true);
+            }
+            catch
+            {
+                // TODO: log exception details somewhere (db/eventlog/file)
+                SetContentResult(false);
             }
         }
 
         [WebMethod]
-        public void DuplicateSurvey(int SurveyID) {
+        public void DuplicateSurvey(int SurveyID)
+        {
             // Duplicating Survey :: NewSurvey
             #region Duplicating Survey
 
@@ -491,7 +554,7 @@ namespace GrowSurv.common
                 Answer answers = new Answer();
                 answers.getAnswersByQuestionID(question.QuestionID);
 
-                
+
                 answers.DeleteAll();
                 question.MarkAsDeleted();
                 try
@@ -694,7 +757,7 @@ namespace GrowSurv.common
             answ.LoadByPrimaryKey(AnswerID);
             answ.SetColumnNull("NextQuestionID");
             answ.SetColumnNull("NextBranchID");
-            answ.Save();            
+            answ.Save();
             SetContentResult(true);
         }
         [WebMethod]
@@ -723,13 +786,13 @@ namespace GrowSurv.common
             if (model.BranchID != 0)
                 survs.QuestionBranchID = model.BranchID;
             else
-                survs.SetColumnNull("QuestionBranchID");            
+                survs.SetColumnNull("QuestionBranchID");
             survs.QuestionOrder = model.QuestionOrder;
             if (model.ParentQuestionID != 0)
                 survs.ParentQuestionID = model.ParentQuestionID;
             else
                 survs.SetColumnNull("ParentQuestionID");
-            
+
             survs.SurveyID = model.SurveyID;
             survs.Save();
 
@@ -742,7 +805,7 @@ namespace GrowSurv.common
                 QuestionOrder = survs.QuestionOrder,
                 Weight = survs.Weight,
                 CategoryID = survs.IsColumnNull("QuestionCatergoryID") ? 0 : survs.QuestionCatergoryID,
-                BranchID = survs.IsColumnNull("QuestionBranchID") ? 0: survs.QuestionBranchID,
+                BranchID = survs.IsColumnNull("QuestionBranchID") ? 0 : survs.QuestionBranchID,
                 SurveyID = survs.SurveyID
             };
             SetContentResult(tempQuestion);
@@ -758,15 +821,15 @@ namespace GrowSurv.common
                 survs.QuestionOrder = item.QuestionOrder;
                 survs.Save();
             }
-            
+
         }
-        
+
         [WebMethod]
         public void deleteQuestion(int QuestionID)
         {
             Question question = new Question();
             question.LoadByPrimaryKey(QuestionID);
-            
+
             Answer answers = new Answer();
             answers.getAnswersByQuestionID(QuestionID);
 
@@ -926,7 +989,7 @@ namespace GrowSurv.common
                 Categories.MoveNext();
 
             }
-            
+
 
             SurveyMember mem = new SurveyMember();
             mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, memberMail);
@@ -940,9 +1003,9 @@ namespace GrowSurv.common
                 if (dataObject.Length > 1)
                     dataObject += ",";
                 switch (surveyData.GetColumn("QuestionTypeID").ToString())
-                {                    
-                    case "1":                        
-                        dataObject += "\""+surveyData.GetColumn("QuestionID").ToString() + "\""  + ":" + "\""+ surveyData.GetColumn("AnswerText").ToString() + "\"";
+                {
+                    case "1":
+                        dataObject += "\"" + surveyData.GetColumn("QuestionID").ToString() + "\"" + ":" + "\"" + surveyData.GetColumn("AnswerText").ToString() + "\"";
                         break;
                     case "2":
                     case "4":
@@ -982,10 +1045,10 @@ namespace GrowSurv.common
                 surveyData.MoveNext();
             }
             dataObject += "}";
-            dynamic x = new { survey = surveyJson, surveydata= dataObject };
+            dynamic x = new { survey = surveyJson, surveydata = dataObject };
             SetContentResult(x);
         }
-        
+
         [WebMethod]
         public void submitSurveyAsJson(int SurveyID, string member, object surveydata, bool IsSubmitted)
         {
@@ -996,7 +1059,7 @@ namespace GrowSurv.common
             mykeylist.AddRange((dynamic)obj.Keys);
             SurveyMember mem = new SurveyMember();
             mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, member);
-			mem.IsSurveySubmited = IsSubmitted;
+            mem.IsSurveySubmited = IsSubmitted;
             if (IsSubmitted)
                 mem.SubmitDate = DateTime.Now;
             else
@@ -1005,7 +1068,7 @@ namespace GrowSurv.common
             for (int i = 0; i < mykeylist.Count; i++)
             {
                 Question q = new Question();
-                q.LoadByPrimaryKey(int.Parse(mykeylist[i].ToString()));                
+                q.LoadByPrimaryKey(int.Parse(mykeylist[i].ToString()));
                 SurveyMemberAnswer answer = new SurveyMemberAnswer();
                 if (!answer.getAnswerByMemberIDAndQuestionID(mem.MemberID, q.QuestionID))
                     answer.AddNew();
@@ -1060,13 +1123,13 @@ namespace GrowSurv.common
                         }
                         subanswer.Save();
                     }
-					continue;
+                    continue;
                 }
                 else if (q.QuestionTypeID == 3)
                 {
                     List<object> mysubvaluelist = new List<object>();
                     mysubvaluelist.AddRange((dynamic)myvaluelist[i]);
-					SurveyMemberAnswer subanswer = new SurveyMemberAnswer();
+                    SurveyMemberAnswer subanswer = new SurveyMemberAnswer();
                     if (subanswer.getAnswerByMemberIDAndQuestionID(mem.MemberID, q.QuestionID))
                     {
                         subanswer.DeleteAll();
@@ -1084,7 +1147,7 @@ namespace GrowSurv.common
                             subanswer.Save();
                         }
                     }
-					continue;
+                    continue;
                 }
                 else
                 {
@@ -1097,7 +1160,7 @@ namespace GrowSurv.common
             SetContentResult(true);
         }
         [WebMethod]
-        public void submitDemographicData(int SurveyID, string member,int conId,  int govId, int areaID, int branchID, int departmentID,
+        public void submitDemographicData(int SurveyID, string member, int conId, int govId, int areaID, int branchID, int departmentID,
                         int divisionID, int level, int grade, int jobTitle, int ageGroup, int gender, int durationInSeconds)
         {
             SurveyMember _member = new SurveyMember();
@@ -1202,7 +1265,7 @@ namespace GrowSurv.common
             }
         }
         [WebMethod]
-        public void importQuestionBulk(int NewSurveyID , List<int> QuestionsIDList)
+        public void importQuestionBulk(int NewSurveyID, List<int> QuestionsIDList)
         {
             foreach (int item in QuestionsIDList)
             {
@@ -1258,7 +1321,7 @@ namespace GrowSurv.common
         }
 
 
-		[WebMethod]
+        [WebMethod]
         public void getBranchingRules(int SurveyID)
         {
             List<BranchingQuestionsModel> Branchs = new List<BranchingQuestionsModel>();
@@ -1266,7 +1329,7 @@ namespace GrowSurv.common
             ques.GetSurveyQuestionsBySurveyIDWithBranching(SurveyID);
             for (int i = 0; i < ques.RowCount; i++)
             {
-                
+
                 Branchs.Add(new BranchingQuestionsModel
                 {
                     AnswerID = int.Parse(ques.GetColumn("AnswerID").ToString()),
@@ -1277,13 +1340,13 @@ namespace GrowSurv.common
                     SkipToBranchID = int.Parse(ques.GetColumn("SkipToBranchID").ToString()),
                     SkipToBranchText = ques.GetColumn("SkipToBranchText").ToString()
                 });
-                    
+
                 ques.MoveNext();
             }
 
             SetContentResult(Branchs);
         }
-		
+
         [WebMethod]
         public void duplicateQuestion(int QuestionID)
         {
@@ -1324,7 +1387,7 @@ namespace GrowSurv.common
             }
         }
 
-		
+
 
         #endregion
 
@@ -1371,7 +1434,7 @@ namespace GrowSurv.common
             {
                 SureveyID = category.SureveyID,
                 CategoryID = category.CategoryID,
-                ArName = category.ArName,                
+                ArName = category.ArName,
                 EnName = category.EnName
             };
 
@@ -1380,7 +1443,7 @@ namespace GrowSurv.common
         }
         [WebMethod]
         public void deleteQuestionCategory(int CategoryID)
-        {            
+        {
             QuestionCategory category = new QuestionCategory();
             category.LoadByPrimaryKey(CategoryID);
             category.MarkAsDeleted();
@@ -1393,7 +1456,7 @@ namespace GrowSurv.common
             {
                 SetContentResult(false);
             }
-            
+
         }
         #endregion
 
@@ -1477,7 +1540,7 @@ namespace GrowSurv.common
             question.Query.Load();
             for (int i = 0; i < question.RowCount; i++)
             {
-                Questions.Add(new QuestionModel { QuestionID = question.QuestionID, EnTitle = question.EnTitle,ArTitle = question.ArTitle,ParentQuestionID = question.ParentQuestionID });
+                Questions.Add(new QuestionModel { QuestionID = question.QuestionID, EnTitle = question.EnTitle, ArTitle = question.ArTitle, ParentQuestionID = question.ParentQuestionID });
                 question.MoveNext();
             }
 
@@ -1509,7 +1572,7 @@ namespace GrowSurv.common
             else
                 cats.LoadByPrimaryKey(model.MemberID);
 
-            cats.MemberEmail = model.MemberEmail == null ? "" : model.MemberEmail;            
+            cats.MemberEmail = model.MemberEmail == null ? "" : model.MemberEmail;
             cats.SurveyID = model.SurveyID;
             cats.Save();
             SetContentResult(true);
@@ -1552,7 +1615,8 @@ namespace GrowSurv.common
         #region Live Support
 
         [WebMethod]
-        public void getSupportTickets() {
+        public void getSupportTickets()
+        {
             SupportTicket supportTickets = new SupportTicket();
             List<SupportTicketModel> supportTicketModels = new List<SupportTicketModel>();
 
@@ -1571,13 +1635,13 @@ namespace GrowSurv.common
                         TicketMessage obj2 = new TicketMessage();
                         obj2.getLastMessageDate(supportTickets.SupportTicketID);
                         DateTime? lastdate = null;
-                        if(obj2.RowCount > 0)
-                            if(!obj2.IsColumnNull("LastMessageDate"))
+                        if (obj2.RowCount > 0)
+                            if (!obj2.IsColumnNull("LastMessageDate"))
                                 lastdate = DateTime.Parse(obj2.GetColumn("LastMessageDate").ToString());
                         supportTicketModels.Add(new SupportTicketModel
                         {
                             UserName = supportTickets.GetColumn("UserName").ToString(),
-                            TicketTitle = supportTickets.TicketTitle.Length > 50 ? supportTickets.TicketTitle.Substring(0,50) + "...": supportTickets.TicketTitle,
+                            TicketTitle = supportTickets.TicketTitle.Length > 50 ? supportTickets.TicketTitle.Substring(0, 50) + "..." : supportTickets.TicketTitle,
                             TicketDate = supportTickets.TicketDate,
                             SupportTicketID = supportTickets.SupportTicketID,
                             IsClosed = supportTickets.IsClosed,
@@ -1614,11 +1678,11 @@ namespace GrowSurv.common
                     }
                 }
             }
-            SetContentResult(supportTicketModels.OrderByDescending(i=>i.LastMessageDate));
+            SetContentResult(supportTicketModels.OrderByDescending(i => i.LastMessageDate));
         }
 
         [WebMethod]
-        public void getSupportMessages(int supportTicketID,bool isAdmin)
+        public void getSupportMessages(int supportTicketID, bool isAdmin)
         {
             setMessagesAsRead(supportTicketID, isAdmin);
             TicketMessage ticketMessage = new TicketMessage();
@@ -1644,14 +1708,14 @@ namespace GrowSurv.common
             SetContentResult(messages);
         }
 
-        public void setMessagesAsRead(int supportTicketID,bool IsAdmin)
+        public void setMessagesAsRead(int supportTicketID, bool IsAdmin)
         {
             TicketMessage obj = new TicketMessage();
             obj.setMessagesAsRead(supportTicketID, IsAdmin ? 1 : 0);
         }
 
         [WebMethod]
-        public void sendMessage(int supportTicketID,bool isAdmin, string messageContent)
+        public void sendMessage(int supportTicketID, bool isAdmin, string messageContent)
         {
             TicketMessage obj = new TicketMessage();
             obj.AddNew();
@@ -1875,7 +1939,7 @@ namespace GrowSurv.common
         {
             List<CompanyModel> survies = new List<CompanyModel>();
             Company survs = new Company();
-            if(companyID == 0)
+            if (companyID == 0)
                 survs.searchCompany("");
             else
                 survs.LoadByPrimaryKey(companyID);
@@ -1891,10 +1955,10 @@ namespace GrowSurv.common
         [WebMethod]
         public void getAllSurveyTypes()
         {
-            
+
             SurveyType survs = new SurveyType();
             survs.LoadAll();
-            
+
             SetContentResult(survs.DefaultView.Table);
         }
 
@@ -1979,9 +2043,19 @@ namespace GrowSurv.common
             GenderWeight genderList = new GenderWeight();
             genderList.GenderBySurveyID(surveyId, companyID);
 
-            dynamic result = new { ConList = conList.DefaultView.ToTable(), GovList = govList.DefaultView.ToTable(), BranchList = branchList.DefaultView.ToTable(), DeptList = deptList.DefaultView.ToTable()
-                , DivList = divList.DefaultView.ToTable(), AreaList = areaList.DefaultView.ToTable(), AgeList = ageList.DefaultView.ToTable(),
-                LevelList = levelList.DefaultView.ToTable(), JobTitleList = jtList.DefaultView.ToTable(), GradeList = gradeList.DefaultView.ToTable(), 
+            dynamic result = new
+            {
+                ConList = conList.DefaultView.ToTable(),
+                GovList = govList.DefaultView.ToTable(),
+                BranchList = branchList.DefaultView.ToTable(),
+                DeptList = deptList.DefaultView.ToTable()
+                ,
+                DivList = divList.DefaultView.ToTable(),
+                AreaList = areaList.DefaultView.ToTable(),
+                AgeList = ageList.DefaultView.ToTable(),
+                LevelList = levelList.DefaultView.ToTable(),
+                JobTitleList = jtList.DefaultView.ToTable(),
+                GradeList = gradeList.DefaultView.ToTable(),
                 GenderList = genderList.DefaultView.ToTable()
             };
 
@@ -2024,7 +2098,7 @@ namespace GrowSurv.common
                 {
                     for (int i = 0; i < rows; i++)
                     {
-                        if(!govList.IsColumnNull("WeightID"))
+                        if (!govList.IsColumnNull("WeightID"))
                             govList.MarkAsDeleted();
                         govList.MoveNext();
                     }
@@ -2032,7 +2106,7 @@ namespace GrowSurv.common
                 }
                 catch (Exception ex)
                 {
-                    
+
                 }
             }
 
@@ -2054,7 +2128,7 @@ namespace GrowSurv.common
                 }
                 catch (Exception ex)
                 {
-                    
+
                 }
             }
 
@@ -2076,13 +2150,13 @@ namespace GrowSurv.common
                 }
                 catch (Exception ex)
                 {
-                    
+
                 }
             }
 
             DepartmentWeight deptList = new DepartmentWeight();
             deptList.DepartmentBySurveyID(surveyId, companyID);
-            if(deptList.RowCount > 0)
+            if (deptList.RowCount > 0)
             {
                 int rows = deptList.RowCount;
 
@@ -2104,7 +2178,7 @@ namespace GrowSurv.common
 
             AreaWeight areaList = new AreaWeight();
             areaList.AreaBySurveyID(surveyId, companyID);
-            if(areaList.RowCount > 0)
+            if (areaList.RowCount > 0)
             {
                 int rows = areaList.RowCount;
 
@@ -2126,7 +2200,7 @@ namespace GrowSurv.common
 
             AgeGroupWeight ageList = new AgeGroupWeight();
             ageList.AgeGroupBySurveyID(surveyId, companyID);
-            if(ageList.RowCount > 0)
+            if (ageList.RowCount > 0)
             {
                 int rows = ageList.RowCount;
 
@@ -2142,7 +2216,7 @@ namespace GrowSurv.common
                 }
                 catch (Exception ex)
                 {
-                    
+
                 }
             }
 
@@ -2248,7 +2322,7 @@ namespace GrowSurv.common
 
             govList = new GovernrateWeight();
             foreach (dynamic item in AllWeights["GovList"])
-            {                
+            {
                 double weight = 0;
                 if (double.TryParse(item.Weight.ToString(), out weight))
                 {
@@ -2257,7 +2331,7 @@ namespace GrowSurv.common
                     govList.GovernrateID = int.Parse(item.GovernrateID.ToString());
                     govList.Weight = weight;
                 }
-                
+
             }
             govList.Save();
 
