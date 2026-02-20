@@ -1,17 +1,18 @@
 ﻿using GrowSurv.BLL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Services;
+using GrowSurv.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using GrowSurv.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
-using System.IO;
-using System.Net.Mail;
+using System.Web;
 using System.Web.Security;
+using System.Web.Services;
 
 namespace GrowSurv.common
 {
@@ -34,13 +35,13 @@ namespace GrowSurv.common
         // === Static SMTP Settings (TEMP) ===
         // ⚠️ Do NOT commit real password to git.
         private static readonly string SmtpHost = "mail.tedorcg.com"; // put the REAL host here
-        private static readonly int SmtpPort = 465;
+        private static readonly int SmtpPort = 587;
         private static readonly bool SmtpEnableSsl = true;
 
-        private static readonly string SmtpUser = "Survey@tedorcg.com";
+        private static readonly string SmtpUser = "survey@tedorcg.com";
         private static readonly string SmtpPass = "Tedorcg@01222468078"; // insert locally
 
-        private static readonly string FromEmail = "Survey@tedorcg.com";
+        private static readonly string FromEmail = "survey@tedorcg.com";
         private static readonly string SurveyBaseUrl = "http://grewsur.tedorcg.com/doSurvey/index.aspx";
 
         #region Survey Functions
@@ -267,13 +268,29 @@ namespace GrowSurv.common
                                 link
                             );
 
-                            using (var client = new SmtpClient(SmtpHost, SmtpPort))
+                            try
                             {
-                                client.EnableSsl = SmtpEnableSsl;
-                                client.UseDefaultCredentials = false;
-                                client.Credentials = new System.Net.NetworkCredential(SmtpUser, SmtpPass);
+                                using (var client = new SmtpClient(SmtpHost, SmtpPort))
+                                {
+                                    client.EnableSsl = SmtpEnableSsl;
+                                    client.Timeout = 10000;
+                                    client.UseDefaultCredentials = false;
+                                    client.Credentials = new NetworkCredential(SmtpUser, SmtpPass);
 
-                                client.Send(msg);
+                                    client.Send(msg);
+                                }
+
+                                SetContentResult(true);
+                            }
+                            catch (SmtpException ex)
+                            {
+                                // log ex.StatusCode + ex.Message + ex.InnerException?.Message
+                                SetContentResult(false);
+                            }
+                            catch (Exception ex)
+                            {
+                                // log ex.Message + ex.InnerException?.Message
+                                SetContentResult(false);
                             }
                         }
                     }
