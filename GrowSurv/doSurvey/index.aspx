@@ -6,68 +6,71 @@
 <head runat="server">
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
-        <link href="../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-        <link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />        
-        <link id="lnkCSS" runat="server" href = "../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
+    <link id="lnkCSS" runat="server" href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../assets/surveyplugin/survey.css" rel="stylesheet" />
     <style type="text/css">
         .progress {
-  overflow: hidden;
-  background-color: gray;
-  padding: 0;
-  margin-bottom: 10px;
-}
-.bar-green {
-  background-color: #1ab394;
-  color: #fff;
-  padding-left: 10px;
-  float: left;
-}
+            overflow: hidden;
+            background-color: gray;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+
+        .bar-green {
+            background-color: #1ab394;
+            color: #fff;
+            padding-left: 10px;
+            float: left;
+        }
+
         .padding-tb-10 {
-            padding-top :10px;
-            padding-bottom:10px;
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
 
         @font-face {
-    font-family: 'JF-Flat';
-    src: url('../fonts/glyphicons-halflings-regular.eot'); /* IE9 Compat Modes */
-    src: url('../fonts/glyphicons-halflings-regular.eot#iefix') format('embedded-opentype'), /* IE6-IE8 */
-    url('../fonts/JF-Flat-regular.woff') format('woff'), /* Pretty Modern Browsers */
-    url('../fonts/JF-Flat-regular.ttf') format('truetype'), /* Safari, Android, iOS */
-    url('../fonts/JF-Flat-regular.svg') format('svg'); /* Legacy iOS */
-}
+            font-family: 'JF-Flat';
+            src: url('../fonts/glyphicons-halflings-regular.eot'); /* IE9 Compat Modes */
+            src: url('../fonts/glyphicons-halflings-regular.eot#iefix') format('embedded-opentype'), /* IE6-IE8 */
+            url('../fonts/JF-Flat-regular.woff') format('woff'), /* Pretty Modern Browsers */
+            url('../fonts/JF-Flat-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+            url('../fonts/JF-Flat-regular.svg') format('svg'); /* Legacy iOS */
+        }
 
-.font-JF {
-    font-family: 'JF-Flat',sans-serif;
-}
+        .font-JF {
+            font-family: 'JF-Flat',sans-serif;
+        }
 
-.font-JF-force {
-    font-family: 'JF-Flat',sans-serif !important;
-}
+        .font-JF-force {
+            font-family: 'JF-Flat',sans-serif !important;
+        }
 
         .lang_label {
-            text-decoration:none;
-            color:black;
-            font-weight:bold;
-            font-size:20px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            font-size: 20px;
         }
 
         .rtl {
-            direction:rtl !important;
+            direction: rtl !important;
         }
+
         .invitation {
-            padding:10px;
-            background-color:rgba(255, 255, 255, 0.5);
-            font-size:16px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
-        <asp:HiddenField id="uiHiddenFieldsurveyID" value="0" runat="server" />
-        <asp:HiddenField id="uiHiddenFieldMemberID" value="0" runat="server" />
+        <asp:HiddenField ID="uiHiddenFieldsurveyID" Value="0" runat="server" />
+        <asp:HiddenField ID="uiHiddenFieldMemberID" Value="0" runat="server" />
         <asp:HiddenField ID="uiHiddenFieldCurrentLang" runat="server" Value="en" />
-    
+
         <div class="col-lg-12 padding-tb-10">
             <div class="col-lg-2">
                 <img src="../assets/global/img/final_logo.png" alt="logo" class="logo-default" style="max-height: 35px; -webkit-filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.70)); filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.70));" />
@@ -99,7 +102,7 @@
                     </div>
                 </div>
                 <div style="margin: 0 auto; border: 1px solid #1ab394;" class="clearfix" id="PreSurvey" runat="server" visible="false">
-                    <div class="col-md-12">                        
+                    <div class="col-md-12">
                         <p>
                             <asp:Literal ID="uiLiteralDemographicHeader" runat="server" />
                         </p>
@@ -112,7 +115,7 @@
                             <asp:DropDownList CssClass="form-control" ID="uiDropDownListCon" runat="server"></asp:DropDownList>
                             <asp:HiddenField ID="uiHiddenFieldCon" Value="0" runat="server" />
                         </div>
-                       
+
                     </div>
                     <div class="col-md-12 clearfix padding-tb-10">
                         <div class="col-md-3" runat="server" id="govLabelDiv">
@@ -215,7 +218,7 @@
                 </div>
 
                 <div style="margin: 0 auto; border: 1px solid #1ab394;" id="MainSurvey" runat="server" visible="false">
-                    <p style="padding:5px;text-align:center">
+                    <p style="padding: 5px; text-align: center">
                         <asp:Literal ID="uiLiteralHeader" runat="server"></asp:Literal>
                     </p>
                     <div id="surveyContainer"></div>
@@ -223,7 +226,7 @@
                     <div style="float: right" id="SaveAndContinue">
                         <input type="button" id="SaveAndContinueBtn" class="sv_complete_btn" value="Save and continue later" style="margin-left: 5px; margin-right: 5px;" />
                     </div>
-                    <p style="padding:5px;text-align:center">
+                    <p style="padding: 5px; text-align: center">
                         <asp:Literal ID="uiLiteralFooter" runat="server"></asp:Literal>
 
                     </p>
@@ -232,21 +235,21 @@
 
             </div>
             <div class="col-lg-2">
-
             </div>
         </div>
 
-       <div class="col-lg-12 padding-tb-10">
+        <div class="col-lg-12 padding-tb-10">
             <div class="col-lg-2">
                 Powered by 
                 <a href="http://q-bitware.com" target="_blank">
                     <img src="../assets/pages/img/q-bitware.png" style="max-height: 50px; margin-left: -15px; -webkit-filter: drop-shadow(1px 1px 1px black); filter: drop-shadow(1px 1px 1px black);" />
                 </a>
             </div>
-           <div class="col-lg-8" style="text-align:center">
-               2018 &copy; <img src="../assets/pages/img/tcg.png" style="max-height: 50px;" />
-               </div>
-           </div>
+            <div class="col-lg-8" style="text-align: center">
+                2018 &copy;
+                <img src="../assets/pages/img/tcg.png" style="max-height: 50px;" />
+            </div>
+        </div>
 
         <div class="modal fade" id="myModal" role="dialog">
             <div class="modal-dialog">
@@ -255,13 +258,10 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title" id="modalTitle">
-
-                        </h4>
+                        <h4 class="modal-title" id="modalTitle"></h4>
                     </div>
                     <div class="modal-body">
                         <p id="modalText">
-
                         </p>
                     </div>
                     <div class="modal-footer">
@@ -317,47 +317,47 @@
                         setTimeout(function () { $('.sv_container .sv_nav').append($("#SaveAndContinue")); }, 300);
                     }
                 });
-               
-                
-          //      var surveyJSON = {
-          //          title: "Tell us, what technologies do you use?", pages: [
-          //{
-          //    showQuestionNumbers: true,
-          //    name: "page1", questions: [
-          //      { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "frameworkUsing1", title: "Do you use any front-end framework like Bootstrap?" },
-          //      { type: "checkbox", choices: ["Bootstrap", "Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visibleIf: "{frameworkUsing} = 'Yes'" }
-          //    ]
-          //},
-          //{
-          //    showQuestionNumbers: true,
-          //    name: "page2", questions: [
-          //      { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "frameworkUsing2", title: "Do you use any front-end framework like Bootstrap?" },
-          //      { type: "checkbox", choices: ["Bootstrap", "Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visibleIf: "{frameworkUsing} = 'Yes'" }
-          //    ]
-          //},
-          //{
-          //    showQuestionNumbers: true,
-          //    name: "page3", questions: [
-          //      { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "frameworkUsing", title: "Do you use any front-end framework like Bootstrap?" },
-          //      { type: "checkbox", choices: ["Bootstrap", "Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visibleIf: "{frameworkUsing} = 'Yes'" }
-          //    ]
-          //},
-          //{
-          //    name: "page4", questions: [
-          //    { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "mvvmUsing", title: "Do you use any MVVM framework?" },
-          //    { type: "checkbox", choices: ["AngularJS", "KnockoutJS", "React"], hasOther: true, isRequired: true, name: "mvvm", title: "What MVVM framework do you use?", visibleIf: "{mvvmUsing} = 'Yes'" }]
-          //},
-          //{
-          //    name: "page5", questions: [
-          //    { type: "text", name: "about", title: "Please tell us about your main requirements for Survey library" }]
-          //}
-          //          ]
-          //      };
+
+
+                //      var surveyJSON = {
+                //          title: "Tell us, what technologies do you use?", pages: [
+                //{
+                //    showQuestionNumbers: true,
+                //    name: "page1", questions: [
+                //      { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "frameworkUsing1", title: "Do you use any front-end framework like Bootstrap?" },
+                //      { type: "checkbox", choices: ["Bootstrap", "Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visibleIf: "{frameworkUsing} = 'Yes'" }
+                //    ]
+                //},
+                //{
+                //    showQuestionNumbers: true,
+                //    name: "page2", questions: [
+                //      { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "frameworkUsing2", title: "Do you use any front-end framework like Bootstrap?" },
+                //      { type: "checkbox", choices: ["Bootstrap", "Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visibleIf: "{frameworkUsing} = 'Yes'" }
+                //    ]
+                //},
+                //{
+                //    showQuestionNumbers: true,
+                //    name: "page3", questions: [
+                //      { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "frameworkUsing", title: "Do you use any front-end framework like Bootstrap?" },
+                //      { type: "checkbox", choices: ["Bootstrap", "Foundation"], hasOther: true, isRequired: true, name: "framework", title: "What front-end framework do you use?", visibleIf: "{frameworkUsing} = 'Yes'" }
+                //    ]
+                //},
+                //{
+                //    name: "page4", questions: [
+                //    { type: "radiogroup", choices: ["Yes", "No"], isRequired: true, name: "mvvmUsing", title: "Do you use any MVVM framework?" },
+                //    { type: "checkbox", choices: ["AngularJS", "KnockoutJS", "React"], hasOther: true, isRequired: true, name: "mvvm", title: "What MVVM framework do you use?", visibleIf: "{mvvmUsing} = 'Yes'" }]
+                //},
+                //{
+                //    name: "page5", questions: [
+                //    { type: "text", name: "about", title: "Please tell us about your main requirements for Survey library" }]
+                //}
+                //          ]
+                //      };
                 //Survey.Survey.cssType = "bootstrap";
 
-                
+
             });
-            
+
             function sendDataToServer(survey, IsSubmitted) {
                 survey.stopTimer();
                 var resultAsString = JSON.stringify(survey.data);
@@ -375,36 +375,36 @@
                 });
 
                 var conID = 0, govID = 0, areaID = 0, branchID = 0, departmentID = 0, divisionID = 0, level = 0, grade = 0, jobTitle = 0, ageGroup = 0, gender = 0;
-                 if ($('#<%= uiDropDownListCon.ClientID%>').val() != "")
-                     conID = $('#<%= uiDropDownListCon.ClientID %>').val();
-                if ( $('#<%= uiDropDownListGov.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListCon.ClientID%>').val() != "")
+                    conID = $('#<%= uiDropDownListCon.ClientID %>').val();
+                if ($('#<%= uiDropDownListGov.ClientID%>').val() != "")
                     govID = $('#<%= uiDropDownListGov.ClientID %>').val();
-                if( $('#<%= uiDropDownListArea.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListArea.ClientID%>').val() != "")
                     areaID = $('#<%= uiDropDownListArea.ClientID %>').val();
-                if( $('#<%= uiDropDownListBranch.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListBranch.ClientID%>').val() != "")
                     branchID = $('#<%= uiDropDownListBranch.ClientID %>').val();
-                if( $('#<%= uiDropDownListDeparment.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListDeparment.ClientID%>').val() != "")
                     departmentID = $('#<%= uiDropDownListDeparment.ClientID %>').val();
-                if( $('#<%= uiDropDownListDivision.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListDivision.ClientID%>').val() != "")
                     divisionID = $('#<%= uiDropDownListDivision.ClientID %>').val();
-                if( $('#<%= uiDropDownListlevel.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListlevel.ClientID%>').val() != "")
                     level = $('#<%= uiDropDownListlevel.ClientID %>').val();
-                if( $('#<%= uiDropDownListGrade.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListGrade.ClientID%>').val() != "")
                     grade = $('#<%= uiDropDownListGrade.ClientID %>').val();
-                if( $('#<%= uiDropDownListJobTitle.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListJobTitle.ClientID%>').val() != "")
                     jobTitle = $('#<%= uiDropDownListJobTitle.ClientID %>').val();
-                if( $('#<%= uiDropDownListAgeGroup.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListAgeGroup.ClientID%>').val() != "")
                     ageGroup = $('#<%= uiDropDownListAgeGroup.ClientID %>').val();
-                if ( $('#<%= uiDropDownListGender.ClientID%>').val() != "")
+                if ($('#<%= uiDropDownListGender.ClientID%>').val() != "")
                     gender = $('#<%= uiDropDownListGender.ClientID %>').val();
 
                 $.ajax({
                     type: 'POST',
                     url: '../common/common.asmx/submitDemographicData',
                     data: JSON.stringify({
-                        SurveyID: surveyid, member: membermail, conId : conID, govId: govID, areaID: areaID, branchID: branchID, departmentID: departmentID,
+                        SurveyID: surveyid, member: membermail, conId: conID, govId: govID, areaID: areaID, branchID: branchID, departmentID: departmentID,
                         divisionID: divisionID, level: level, grade: grade, jobTitle: jobTitle, ageGroup: ageGroup, gender: gender, durationInSeconds: survey.timeSpent
-                        }),
+                    }),
                     contentType: 'application/json',
                     dataType: 'application/json'
                 }).done(function () {
@@ -417,71 +417,66 @@
             }
 
 
-            function MoveNext()
-            {
+            function MoveNext() {
                 var errors = "";
-                if ($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en")
-                {
+                if ($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en") {
                     $('#modalTitle').html("Error");
-                    if($('#<%= uiHiddenFieldCon.ClientID %>').val() != "0" && $('#<%= uiDropDownListCon.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldCon.ClientID %>').val() != "0" && $('#<%= uiDropDownListCon.ClientID%>').val() == "")
                         errors += "Please select country" + "<br />";
                     if ($('#<%= uiHiddenFieldGov.ClientID %>').val() != "0" && $('#<%= uiDropDownListGov.ClientID%>').val() == "")
                         errors += "Please select state" + "<br />";
-                    if($('#<%= uiHiddenFieldArea.ClientID %>').val() != "0" && $('#<%= uiDropDownListArea.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldArea.ClientID %>').val() != "0" && $('#<%= uiDropDownListArea.ClientID%>').val() == "")
                         errors += "Please select area" + "<br />";
-                    if($('#<%= uiHiddenFieldBranch.ClientID %>').val() != "0" && $('#<%= uiDropDownListBranch.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldBranch.ClientID %>').val() != "0" && $('#<%= uiDropDownListBranch.ClientID%>').val() == "")
                         errors += "Please select branch" + "<br />";
-                    if($('#<%= uiHiddenFieldDepartment.ClientID %>').val() != "0" && $('#<%= uiDropDownListDeparment.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldDepartment.ClientID %>').val() != "0" && $('#<%= uiDropDownListDeparment.ClientID%>').val() == "")
                         errors += "Please select department" + "<br />";
-                    if($('#<%= uiHiddenFieldDivision.ClientID %>').val() != "0" && $('#<%= uiDropDownListDivision.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldDivision.ClientID %>').val() != "0" && $('#<%= uiDropDownListDivision.ClientID%>').val() == "")
                         errors += "Please select division" + "<br />";
-                    if($('#<%= uiHiddenFieldLevel.ClientID %>').val() != "0" && $('#<%= uiDropDownListlevel.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldLevel.ClientID %>').val() != "0" && $('#<%= uiDropDownListlevel.ClientID%>').val() == "")
                         errors += "Please select level" + "<br />";
-                    if($('#<%= uiHiddenFieldGrade.ClientID %>').val() != "0" && $('#<%= uiDropDownListGrade.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldGrade.ClientID %>').val() != "0" && $('#<%= uiDropDownListGrade.ClientID%>').val() == "")
                         errors += "Please select grade" + "<br />";
-                    if($('#<%= uiHiddenFieldJobTitle.ClientID %>').val() != "0" && $('#<%= uiDropDownListJobTitle.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldJobTitle.ClientID %>').val() != "0" && $('#<%= uiDropDownListJobTitle.ClientID%>').val() == "")
                         errors += "Please select job title" + "<br />";
-                    if($('#<%= uiHiddenFieldAgeGroup.ClientID %>').val() != "0" && $('#<%= uiDropDownListAgeGroup.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldAgeGroup.ClientID %>').val() != "0" && $('#<%= uiDropDownListAgeGroup.ClientID%>').val() == "")
                         errors += "Please select age group" + "<br />";
-                    if($('#<%= uiHiddenFieldGender.ClientID %>').val() != "0" && $('#<%= uiDropDownListGender.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldGender.ClientID %>').val() != "0" && $('#<%= uiDropDownListGender.ClientID%>').val() == "")
                         errors += "Please select gender" + "<br />";
                 }
-                else
-                {
+                else {
                     $('#modalTitle').html("خطأ");
-                    if($('#<%= uiHiddenFieldCon.ClientID %>').val() != "0" && $('#<%= uiDropDownListCon.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldCon.ClientID %>').val() != "0" && $('#<%= uiDropDownListCon.ClientID%>').val() == "")
                         errors += "من فضلك إختر البلد" + "<br />";
                     if ($('#<%= uiHiddenFieldGov.ClientID %>').val() != "0" && $('#<%= uiDropDownListGov.ClientID%>').val() == "")
                         errors += "من فضلك إختر المحافظة" + "<br />";
-                    if($('#<%= uiHiddenFieldArea.ClientID %>').val() != "0" && $('#<%= uiDropDownListArea.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldArea.ClientID %>').val() != "0" && $('#<%= uiDropDownListArea.ClientID%>').val() == "")
                         errors += "من فضلك إختر المنطقة" + "<br />";
-                    if($('#<%= uiHiddenFieldBranch.ClientID %>').val() != "0" && $('#<%= uiDropDownListBranch.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldBranch.ClientID %>').val() != "0" && $('#<%= uiDropDownListBranch.ClientID%>').val() == "")
                         errors += "من فضلك إختر الفرع" + "<br />";
-                    if($('#<%= uiHiddenFieldDepartment.ClientID %>').val() != "0" && $('#<%= uiDropDownListDeparment.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldDepartment.ClientID %>').val() != "0" && $('#<%= uiDropDownListDeparment.ClientID%>').val() == "")
                         errors += "من فضلك إختر القسم" + "<br />";
-                    if($('#<%= uiHiddenFieldDivision.ClientID %>').val() != "0" && $('#<%= uiDropDownListDivision.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldDivision.ClientID %>').val() != "0" && $('#<%= uiDropDownListDivision.ClientID%>').val() == "")
                         errors += "من فضلك إختر القطاع" + "<br />";
-                    if($('#<%= uiHiddenFieldLevel.ClientID %>').val() != "0" && $('#<%= uiDropDownListlevel.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldLevel.ClientID %>').val() != "0" && $('#<%= uiDropDownListlevel.ClientID%>').val() == "")
                         errors += "من فضلك إختر المستوى" + "<br />";
-                    if($('#<%= uiHiddenFieldGrade.ClientID %>').val() != "0" && $('#<%= uiDropDownListGrade.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldGrade.ClientID %>').val() != "0" && $('#<%= uiDropDownListGrade.ClientID%>').val() == "")
                         errors += "من فضلك إختر الدرجة" + "<br />";
-                    if($('#<%= uiHiddenFieldJobTitle.ClientID %>').val() != "0" && $('#<%= uiDropDownListJobTitle.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldJobTitle.ClientID %>').val() != "0" && $('#<%= uiDropDownListJobTitle.ClientID%>').val() == "")
                         errors += "من فضلك إختر الوظيفة" + "<br />";
-                    if($('#<%= uiHiddenFieldAgeGroup.ClientID %>').val() != "0" && $('#<%= uiDropDownListAgeGroup.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldAgeGroup.ClientID %>').val() != "0" && $('#<%= uiDropDownListAgeGroup.ClientID%>').val() == "")
                         errors += "من فضلك إختر الفئة العمرية" + "<br />";
-                    if($('#<%= uiHiddenFieldGender.ClientID %>').val() != "0" && $('#<%= uiDropDownListGender.ClientID%>').val() == "")
+                    if ($('#<%= uiHiddenFieldGender.ClientID %>').val() != "0" && $('#<%= uiDropDownListGender.ClientID%>').val() == "")
                         errors += "من فضلك إختر النوع" + "<br />";
-                    
+
                 }
                 $('#modalText').html(errors);
-                if (errors != "")
-                {
+                if (errors != "") {
                     $("#myModal").modal();
                     return false;
                 }
 
-                else
-                {
+                else {
                     $('#PreSurvey').css('display', 'none');
                     $('#MainSurvey').css('display', 'none');
                     return true;

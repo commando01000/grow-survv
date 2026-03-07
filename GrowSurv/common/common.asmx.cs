@@ -34,8 +34,8 @@ namespace GrowSurv.common
 
         // === Static SMTP Settings (TEMP) ===
         // ⚠️ Do NOT commit real password to git.
-        private static readonly string SmtpHost = "mail.tedorcg.com"; // put the REAL host here
-        private static readonly int SmtpPort = 587;
+        private static readonly string SmtpHost = "mail5013.site4now.net";
+        private static readonly int SmtpPort = 587; // or 465 if 587 fails
         private static readonly bool SmtpEnableSsl = true;
 
         private static readonly string SmtpUser = "survey@tedorcg.com";
@@ -284,13 +284,13 @@ namespace GrowSurv.common
                             }
                             catch (SmtpException ex)
                             {
+                                allOk = false;
                                 // log ex.StatusCode + ex.Message + ex.InnerException?.Message
-                                SetContentResult(false);
                             }
                             catch (Exception ex)
                             {
+                                allOk = false;
                                 // log ex.Message + ex.InnerException?.Message
-                                SetContentResult(false);
                             }
                         }
                     }
