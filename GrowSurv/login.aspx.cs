@@ -30,9 +30,35 @@ namespace GrowSurv
             string password = ConfigurationManager.AppSettings["SeedAdminPassword"] ?? "Admin@12345";
             string email = ConfigurationManager.AppSettings["SeedAdminEmail"] ?? "admin@growsurv.local";
 
-            // If user already exists, just ensure role assignment
-            if (Membership.GetUser(username) != null)
+            // If user already exists, make sure it's usable and in the admin role.
+            var existingUser = Membership.GetUser(username);
+            if (existingUser != null)
             {
+                if (!existingUser.IsApproved)
+                {
+                    existingUser.IsApproved = true;
+                    Membership.UpdateUser(existingUser);
+                }
+
+                if (existingUser.IsLockedOut && !existingUser.UnlockUser())
+                    throw new ApplicationException("Admin seed failed: unable to unlock existing admin user.");
+
+                // Keep configured seed password as source of truth when seeding is enabled.
+                if (!Membership.ValidateUser(username, password))
+                {
+                    try
+                    {
+                        string tempPassword = existingUser.ResetPassword();
+                        bool changed = existingUser.ChangePassword(tempPassword, password);
+                        if (!changed)
+                            throw new ApplicationException("Admin seed failed: unable to reset existing admin password.");
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ApplicationException("Admin seed failed while resetting existing admin password.", ex);
+                    }
+                }
+
                 EnsureRoleAndMembership(username, "admin");
                 return;
             }
