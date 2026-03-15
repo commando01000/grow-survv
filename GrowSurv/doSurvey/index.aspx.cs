@@ -51,11 +51,10 @@ namespace GrowSurv.doSurvey
             {
                 try
                 {
-                    surveyID = Decrypt(HttpUtility.UrlDecode(Request.QueryString["sid"]));
+                    surveyID = TryDecryptQueryStringValue("sid");
                     int sid = 0;
                     if (int.TryParse(surveyID, out sid))
                         SurveyID = sid;
-                    member = Decrypt(HttpUtility.UrlDecode(Request.QueryString["mail"]));
                     Survey currentSurvey = new Survey();
 
                     if (SurveyID != 0)
@@ -73,6 +72,12 @@ namespace GrowSurv.doSurvey
 
                     if (!isPublicSurvey)
                     {
+                        member = TryDecryptQueryStringValue("mail");
+                        if (string.IsNullOrWhiteSpace(member))
+                        {
+                            Response.Redirect("unauthorized.aspx", false);
+                            return;
+                        }
 
                         SurveyMember mem = new SurveyMember();
                         if (mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, member))
@@ -116,8 +121,7 @@ namespace GrowSurv.doSurvey
 
         private void BindSurveyInfo(int surveyID)
         {
-            string member = "";
-            member = Decrypt(HttpUtility.UrlDecode(Request.QueryString["mail"]));
+            string member = TryDecryptQueryStringValue("mail");
             SurveyMember mem = new SurveyMember();
             mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, member);
             
@@ -358,6 +362,17 @@ namespace GrowSurv.doSurvey
             return cipherText;
         }
 
+        private string TryDecryptQueryStringValue(string key)
+        {
+            string encryptedValue = Request.QueryString[key];
+            if (string.IsNullOrWhiteSpace(encryptedValue))
+                encryptedValue = Request.QueryString["amp;" + key];
+
+            if (string.IsNullOrWhiteSpace(encryptedValue))
+                return string.Empty;
+
+            return Decrypt(HttpUtility.UrlDecode(encryptedValue));
+        }
         protected void ArabicLink_Click(object sender, EventArgs e)
         {
             Lang = "ar";

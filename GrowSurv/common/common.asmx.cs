@@ -13,6 +13,7 @@ using System.Text;
 using System.Web;
 using System.Web.Security;
 using System.Web.Services;
+using System.Collections.Specialized;
 
 namespace GrowSurv.common
 {
@@ -85,7 +86,7 @@ namespace GrowSurv.common
                     EmailBody = survs.EmailBody,
                     ArEmailBody = survs.ArEmailBody,
                     SkipDemographicPage = survs.IsColumnNull("SkipDemographicPage") ? false : survs.SkipDemographicPage,
-                    PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://grewsur.tedorcg.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
+                    PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? BuildSurveyLink(survs.SurveyID, string.Empty) : ""
                 });
                 survs.MoveNext();
             }
@@ -133,7 +134,7 @@ namespace GrowSurv.common
                 EmailBody = survs.EmailBody,
                 ArEmailBody = survs.ArEmailBody,
                 SkipDemographicPage = survs.IsColumnNull("SkipDemographicPage") ? false : survs.SkipDemographicPage,
-                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://grewsur.tedorcg.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
+                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? BuildSurveyLink(survs.SurveyID, string.Empty) : ""
             });
 
 
@@ -225,7 +226,7 @@ namespace GrowSurv.common
                 EmailBody = survs.EmailBody,
                 ArEmailBody = survs.ArEmailBody,
                 SkipDemographicPage = survs.IsColumnNull("SkipDemographicPage") ? false : survs.SkipDemographicPage,
-                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? "http://grewsur.tedorcg.com/doSurvey/index.aspx?sid=" + HttpUtility.UrlEncode(Encrypt(survs.SurveyID.ToString())) + "&mail=" : ""
+                PublicURL = survs.IsColumnNull("IsPublic") ? "" : survs.IsPublic ? BuildSurveyLink(survs.SurveyID, string.Empty) : ""
             };
             SetContentResult(tempSurvey);
         }
@@ -239,7 +240,6 @@ namespace GrowSurv.common
             Survey mainSurvey = new Survey();
             mainSurvey.LoadByPrimaryKey(SurveyID);
 
-            string sid = HttpUtility.UrlEncode(Encrypt(SurveyID.ToString()));
             bool allOk = true;
 
             for (int i = 0; i < members.RowCount; i++)
@@ -250,8 +250,7 @@ namespace GrowSurv.common
 
                     if (IsValidEmail(to))
                     {
-                        string mail = HttpUtility.UrlEncode(Encrypt(to));
-                        string link = $"{SurveyBaseUrl}?sid={sid}&mail={mail}";
+                        string link = BuildSurveyLink(SurveyID, to);
 
                         using (var msg = new MailMessage())
                         {
@@ -265,7 +264,7 @@ namespace GrowSurv.common
                                 HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(),
                                 mainSurvey.EmailBody,
                                 mainSurvey.ArEmailBody,
-                                link
+                                HttpUtility.HtmlAttributeEncode(link)
                             );
 
                             try
@@ -280,7 +279,6 @@ namespace GrowSurv.common
                                     client.Send(msg);
                                 }
 
-                                SetContentResult(true);
                             }
                             catch (SmtpException ex)
                             {
@@ -326,9 +324,7 @@ namespace GrowSurv.common
                 Survey mainSurvey = new Survey();
                 mainSurvey.LoadByPrimaryKey(surveyID);
 
-                string sid = HttpUtility.UrlEncode(Encrypt(surveyID.ToString()));
-                string mail = HttpUtility.UrlEncode(Encrypt(member.MemberEmail));
-                string link = $"{SurveyBaseUrl}?sid={sid}&mail={mail}";
+                string link = BuildSurveyLink(surveyID, member.MemberEmail);
 
                 using (var msg = new MailMessage())
                 {
@@ -342,7 +338,7 @@ namespace GrowSurv.common
                         HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(),
                         mainSurvey.EmailBody,
                         mainSurvey.ArEmailBody,
-                        link
+                        HttpUtility.HtmlAttributeEncode(link)
                     );
 
                     using (var client = new SmtpClient(SmtpHost, SmtpPort))
@@ -1989,6 +1985,30 @@ namespace GrowSurv.common
             HttpContext.Current.ApplicationInstance.CompleteRequest(); // Causes ASP.NET to bypass all events and filtering in the HTTP pipeline chain of execution and directly execute the EndRequest event.
         }
 
+        private string BuildSurveyLink(int surveyId, string memberEmail)
+        {
+            var baseUri = new Uri(GetSurveyBaseUrl(), UriKind.Absolute);
+            var builder = new UriBuilder(baseUri);
+            NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
+
+            query["sid"] = HttpUtility.UrlEncode(Encrypt(surveyId.ToString()));
+            query["mail"] = string.IsNullOrEmpty(memberEmail) ? string.Empty : HttpUtility.UrlEncode(Encrypt(memberEmail));
+
+            builder.Query = query.ToString();
+            return builder.Uri.AbsoluteUri;
+        }
+
+        private string GetSurveyBaseUrl()
+        {
+            HttpRequest request = HttpContext.Current?.Request;
+            if (request != null && request.Url != null)
+            {
+                string scheme = request.IsSecureConnection ? Uri.UriSchemeHttps : request.Url.Scheme;
+                return string.Format("{0}://{1}{2}", scheme, request.Url.Authority, VirtualPathUtility.ToAbsolute("~/doSurvey/index.aspx"));
+            }
+
+            return SurveyBaseUrl;
+        }
         private string Encrypt(string clearText)
         {
             string EncryptionKey = "MAKV2SPBNI99212";
@@ -2491,3 +2511,6 @@ namespace GrowSurv.common
         }
     }
 }
+
+
+
