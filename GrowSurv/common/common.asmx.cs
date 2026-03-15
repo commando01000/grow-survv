@@ -2,6 +2,7 @@
 using GrowSurv.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ using System.Web;
 using System.Web.Security;
 using System.Web.Services;
 using System.Collections.Specialized;
+using System.Globalization;
 
 namespace GrowSurv.common
 {
@@ -2045,6 +2047,217 @@ namespace GrowSurv.common
         }
 
         [WebMethod]
+        public void SaveDemographicOption(string type, int companyID, object model)
+        {
+            try
+            {
+                JObject data = model == null ? new JObject() : JObject.FromObject(model);
+                switch ((type ?? string.Empty).Trim().ToLowerInvariant())
+                {
+                    case "country":
+                        SaveCountryOption(companyID, data);
+                        break;
+                    case "state":
+                        SaveGovernrateOption(companyID, data);
+                        break;
+                    case "branch":
+                        SaveBranchOption(companyID, data);
+                        break;
+                    case "department":
+                        SaveDepartmentOption(companyID, data);
+                        break;
+                    case "division":
+                        SaveDivisionOption(companyID, data);
+                        break;
+                    case "area":
+                        SaveAreaOption(companyID, data);
+                        break;
+                    case "age":
+                        SaveAgeGroupOption(companyID, data);
+                        break;
+                    case "level":
+                        SaveLevelOption(companyID, data);
+                        break;
+                    case "jobtitle":
+                        SaveJobTitleOption(companyID, data);
+                        break;
+                    case "grade":
+                        SaveGradeOption(companyID, data);
+                        break;
+                    case "gender":
+                        SaveGenderOption(data);
+                        break;
+                    default:
+                        SetContentResult(false);
+                        return;
+                }
+
+                SetContentResult(true);
+            }
+            catch
+            {
+                SetContentResult(false);
+            }
+        }
+
+        private void SaveCountryOption(int companyID, JObject data)
+        {
+            Country item = new Country();
+            item.AddNew();
+            item.EnName = GetRequiredText(data, "EnName");
+            item.ArName = GetOptionalText(data, "ArName", item.EnName);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveGovernrateOption(int companyID, JObject data)
+        {
+            int countryId = GetRequiredInt(data, "CountryID");
+
+            Governrate item = new Governrate();
+            item.AddNew();
+            item.EnName = GetRequiredText(data, "EnName");
+            item.ArName = GetOptionalText(data, "ArName", item.EnName);
+            item.CompanyID = companyID;
+            item.CountryID = countryId;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveBranchOption(int companyID, JObject data)
+        {
+            Branch item = new Branch();
+            item.AddNew();
+            item.NameEn = GetRequiredText(data, "EnName");
+            item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveDepartmentOption(int companyID, JObject data)
+        {
+            Department item = new Department();
+            item.AddNew();
+            item.EnName = GetRequiredText(data, "EnName");
+            item.ArName = GetOptionalText(data, "ArName", item.EnName);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveDivisionOption(int companyID, JObject data)
+        {
+            Division item = new Division();
+            item.AddNew();
+            item.NameEn = GetRequiredText(data, "EnName");
+            item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveAreaOption(int companyID, JObject data)
+        {
+            Area item = new Area();
+            item.AddNew();
+            item.NameEn = GetRequiredText(data, "EnName");
+            item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveAgeGroupOption(int companyID, JObject data)
+        {
+            int startAge = GetRequiredInt(data, "StartAge");
+            int endAge = GetRequiredInt(data, "EndAge");
+            if (endAge < startAge)
+                throw new InvalidOperationException("End age must be greater than or equal to start age.");
+
+            string defaultName = string.Format("{0} - {1}", startAge, endAge);
+            AgeGroup item = new AgeGroup();
+            item.AddNew();
+            item.StartAge = startAge;
+            item.EndAge = endAge;
+            item.EnDisplayName = GetOptionalText(data, "EnName", defaultName);
+            item.ArDisplayName = GetOptionalText(data, "ArName", item.EnDisplayName);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveLevelOption(int companyID, JObject data)
+        {
+            Level item = new Level();
+            item.AddNew();
+            item.EnName = GetRequiredText(data, "EnName");
+            item.ArName = GetOptionalText(data, "ArName", item.EnName);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveJobTitleOption(int companyID, JObject data)
+        {
+            JobTitle item = new JobTitle();
+            item.AddNew();
+            item.EnName = GetRequiredText(data, "EnName");
+            item.ArName = GetOptionalText(data, "ArName", item.EnName);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveGradeOption(int companyID, JObject data)
+        {
+            Grade item = new Grade();
+            item.AddNew();
+            item.EnName = GetRequiredText(data, "EnName");
+            item.ArName = GetOptionalText(data, "ArName", item.EnName);
+            item.CompanyID = companyID;
+            item.IsActive = true;
+            item.Save();
+        }
+
+        private void SaveGenderOption(JObject data)
+        {
+            Gender item = new Gender();
+            item.AddNew();
+            item.NameEn = GetRequiredText(data, "EnName");
+            item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
+            item.Save();
+        }
+
+        private string GetRequiredText(JObject data, string propertyName)
+        {
+            string value = (data.Value<string>(propertyName) ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(value))
+                throw new InvalidOperationException(propertyName + " is required.");
+
+            return value;
+        }
+
+        private string GetOptionalText(JObject data, string propertyName, string fallbackValue)
+        {
+            string value = (data.Value<string>(propertyName) ?? string.Empty).Trim();
+            return string.IsNullOrWhiteSpace(value) ? fallbackValue : value;
+        }
+
+        private int GetRequiredInt(JObject data, string propertyName)
+        {
+            JToken token = data[propertyName];
+            if (token == null)
+                throw new InvalidOperationException(propertyName + " is required.");
+
+            int value;
+            if (int.TryParse(Convert.ToString(token, CultureInfo.InvariantCulture), out value))
+                return value;
+
+            throw new InvalidOperationException(propertyName + " is invalid.");
+        }
+        [WebMethod]
         public void getAllDemographicWeightsBySurveyID(int surveyId, int companyID)
         {
             CountryWeight conList = new CountryWeight();
@@ -2346,7 +2559,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["ConList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     conList.AddNew();
                     conList.SurveyID = surveyId;
@@ -2361,7 +2574,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["GovList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     govList.AddNew();
                     govList.SurveyID = surveyId;
@@ -2376,7 +2589,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["BranchList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     branchList.AddNew();
                     branchList.SurveyID = surveyId;
@@ -2391,7 +2604,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["DeptList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     deptList.AddNew();
                     deptList.SurveyID = surveyId;
@@ -2406,7 +2619,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["DivList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     divList.AddNew();
                     divList.SurveyID = surveyId;
@@ -2421,7 +2634,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["AreaList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     areaList.AddNew();
                     areaList.SurveyID = surveyId;
@@ -2436,7 +2649,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["AgeList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     ageList.AddNew();
                     ageList.SurveyID = surveyId;
@@ -2451,7 +2664,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["LevelList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     levelList.AddNew();
                     levelList.SurveyID = surveyId;
@@ -2466,7 +2679,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["JobTitleList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     jtList.AddNew();
                     jtList.SurveyID = surveyId;
@@ -2481,7 +2694,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["GradeList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     gradeList.AddNew();
                     gradeList.SurveyID = surveyId;
@@ -2496,7 +2709,7 @@ namespace GrowSurv.common
             foreach (dynamic item in AllWeights["GenderList"])
             {
                 double weight = 0;
-                if (double.TryParse(item.Weight.ToString(), out weight))
+                if (TryParseWeight(item, out weight))
                 {
                     genderList.AddNew();
                     genderList.SurveyID = surveyId;
@@ -2509,8 +2722,22 @@ namespace GrowSurv.common
 
             SetContentResult(true);
         }
+        private bool TryParseWeight(dynamic item, out double weight)
+        {
+            weight = 0;
+
+            var rawWeight = Convert.ToString(item.Weight);
+            if (string.IsNullOrWhiteSpace(rawWeight))
+                return false;
+
+            return double.TryParse(rawWeight, NumberStyles.Any, CultureInfo.InvariantCulture, out weight)
+                || double.TryParse(rawWeight, NumberStyles.Any, CultureInfo.CurrentCulture, out weight);
+        }
     }
 }
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-﻿var app = angular.module('globalApp', []);
+var app = angular.module('globalApp', []);
 
 app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.Survey = {};
@@ -871,7 +871,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     };
 
     $scope.getAllDemographicWeights = function () {
-        $http.post("/common/common.asmx/getAllDemographicWeightsBySurveyID", { surveyId: $scope.Survey.SurveyID, companyID: $scope.Survey.CompanyID }).then(function (Result) {
+        return $http.post("/common/common.asmx/getAllDemographicWeightsBySurveyID", { surveyId: $scope.Survey.SurveyID, companyID: $scope.Survey.CompanyID }).then(function (Result) {
             $scope.ConList = Result.data.ConList;
             $scope.GovList = Result.data.GovList;
             $scope.BranchList = Result.data.BranchList;
@@ -883,7 +883,8 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
             $scope.JobTitleList = Result.data.JobTitleList;
             $scope.GradeList = Result.data.GradeList;
             $scope.GenderList = Result.data.GenderList;
-            
+
+            return Result.data;
         }, function () {
             $rootScope.$emit("swAlertError", {});
         });
@@ -898,18 +899,337 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
             DivList: $scope.DivList,
             AreaList: $scope.AreaList,
             AgeList: $scope.AgeList,
-            LevelList : $scope.LevelList,
-            JobTitleList : $scope.JobTitleList ,
-            GradeList : $scope.GradeList ,
+            LevelList: $scope.LevelList,
+            JobTitleList: $scope.JobTitleList,
+            GradeList: $scope.GradeList,
             GenderList: $scope.GenderList
         };
-        $http.post("/common/common.asmx/saveAllDemographicWeightsBySurveyID", { surveyId: $scope.Survey.SurveyID, companyID: $scope.Survey.CompanyID, weights: _weights }).then(function (Result) {
-            if(Result.data == true)
+        return $http.post("/common/common.asmx/saveAllDemographicWeightsBySurveyID", { surveyId: $scope.Survey.SurveyID, companyID: $scope.Survey.CompanyID, weights: _weights }).then(function (Result) {
+            if (Result.data == true)
                 $rootScope.$emit("swAlertSave", {});
 
         }, function () {
             $rootScope.$emit("swAlertError", {});
         });
+    }
+
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function getDemographicInputValue(id) {
+        var element = document.getElementById(id);
+        return element ? $.trim(element.value || "") : "";
+    }
+
+    function getOptionalWeightValue() {
+        return getDemographicInputValue("demographicWeight");
+    }
+
+    function buildInput(id, placeholder, type) {
+        return '<input id="' + id + '" type="' + (type || "text") + '" class="swal2-input" placeholder="' + escapeHtml(placeholder) + '">';
+    }
+
+    function buildWeightInput() {
+        return buildInput("demographicWeight", "Weight (optional)", "number");
+    }
+
+    function buildCountrySelect() {
+        var options = ['<option value="">Select country</option>'];
+        var countries = $scope.ConList || [];
+
+        for (var i = 0; i < countries.length; i++) {
+            options.push('<option value="' + escapeHtml(countries[i].CountryID) + '">' + escapeHtml(countries[i].EnName) + '</option>');
+        }
+
+        return '<select id="demographicCountryId" class="swal2-select">' + options.join("") + '</select>';
+    }
+
+    function getDemographicList(type) {
+        switch (type) {
+            case "country":
+                return $scope.ConList;
+            case "state":
+                return $scope.GovList;
+            case "branch":
+                return $scope.BranchList;
+            case "department":
+                return $scope.DeptList;
+            case "division":
+                return $scope.DivList;
+            case "area":
+                return $scope.AreaList;
+            case "age":
+                return $scope.AgeList;
+            case "level":
+                return $scope.LevelList;
+            case "jobtitle":
+                return $scope.JobTitleList;
+            case "grade":
+                return $scope.GradeList;
+            case "gender":
+                return $scope.GenderList;
+            default:
+                return [];
+        }
+    }
+
+    function matchesDemographicOption(type, item, model) {
+        if (!item) {
+            return false;
+        }
+
+        switch (type) {
+            case "country":
+                return item.EnName == model.EnName;
+            case "state":
+                return item.EnName == model.EnName && String(item.CountryID) == String(model.CountryID);
+            case "branch":
+                return item.NameEn == model.EnName;
+            case "department":
+                return item.EnName == model.EnName;
+            case "division":
+                return item.NameEn == model.EnName;
+            case "area":
+                return item.NameEn == model.EnName;
+            case "age":
+                var defaultAgeName = model.EnName ? model.EnName : (model.StartAge + " - " + model.EndAge);
+                return item.EnDisplayName == defaultAgeName || (String(item.StartAge) == String(model.StartAge) && String(item.EndAge) == String(model.EndAge));
+            case "level":
+                return item.EnName == model.EnName;
+            case "jobtitle":
+                return item.EnName == model.EnName;
+            case "grade":
+                return item.EnName == model.EnName;
+            case "gender":
+                return item.NameEn == model.EnName;
+            default:
+                return false;
+        }
+    }
+
+    function tryApplyNewDemographicWeight(type, model) {
+        var weight = $.trim(model.Weight || "");
+        if (!weight) {
+            return false;
+        }
+
+        var list = getDemographicList(type) || [];
+        for (var i = list.length - 1; i >= 0; i--) {
+            if (matchesDemographicOption(type, list[i], model)) {
+                list[i].Weight = weight;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function buildDemographicDialog(type) {
+        var config = {
+            title: "Add demographic option",
+            html: buildInput("demographicEnName", "English name") +
+                buildInput("demographicArName", "Arabic name (optional)") +
+                buildWeightInput(),
+            validate: function () {
+                var enName = getDemographicInputValue("demographicEnName");
+                if (!enName) {
+                    return "English name is required.";
+                }
+
+                return {
+                    EnName: enName,
+                    ArName: getDemographicInputValue("demographicArName"),
+                    Weight: getOptionalWeightValue()
+                };
+            }
+        };
+
+        switch (type) {
+            case "country":
+                config.title = "Add country";
+                config.html = buildInput("demographicEnName", "Country name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "state":
+                config.title = "Add state";
+                config.html = buildCountrySelect() +
+                    buildInput("demographicEnName", "State name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                config.validate = function () {
+                    var countryId = getDemographicInputValue("demographicCountryId");
+                    var enName = getDemographicInputValue("demographicEnName");
+
+                    if (!countryId) {
+                        return "Country is required.";
+                    }
+
+                    if (!enName) {
+                        return "State name is required.";
+                    }
+
+                    return {
+                        CountryID: parseInt(countryId, 10),
+                        EnName: enName,
+                        ArName: getDemographicInputValue("demographicArName"),
+                        Weight: getOptionalWeightValue()
+                    };
+                };
+                break;
+            case "branch":
+                config.title = "Add branch";
+                config.html = buildInput("demographicEnName", "Branch name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "department":
+                config.title = "Add department";
+                config.html = buildInput("demographicEnName", "Department name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "division":
+                config.title = "Add division";
+                config.html = buildInput("demographicEnName", "Division name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "area":
+                config.title = "Add area";
+                config.html = buildInput("demographicEnName", "Area name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "age":
+                config.title = "Add age group";
+                config.html = buildInput("demographicStartAge", "Start age", "number") +
+                    buildInput("demographicEndAge", "End age", "number") +
+                    buildInput("demographicEnName", "Display name (optional)") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                config.validate = function () {
+                    var startAge = getDemographicInputValue("demographicStartAge");
+                    var endAge = getDemographicInputValue("demographicEndAge");
+                    var parsedStart = parseInt(startAge, 10);
+                    var parsedEnd = parseInt(endAge, 10);
+
+                    if (startAge === "" || isNaN(parsedStart)) {
+                        return "Start age is required.";
+                    }
+
+                    if (endAge === "" || isNaN(parsedEnd)) {
+                        return "End age is required.";
+                    }
+
+                    if (parsedEnd < parsedStart) {
+                        return "End age must be greater than or equal to start age.";
+                    }
+
+                    return {
+                        StartAge: parsedStart,
+                        EndAge: parsedEnd,
+                        EnName: getDemographicInputValue("demographicEnName"),
+                        ArName: getDemographicInputValue("demographicArName"),
+                        Weight: getOptionalWeightValue()
+                    };
+                };
+                break;
+            case "level":
+                config.title = "Add level";
+                config.html = buildInput("demographicEnName", "Level name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "jobtitle":
+                config.title = "Add job title";
+                config.html = buildInput("demographicEnName", "Job title") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "grade":
+                config.title = "Add grade";
+                config.html = buildInput("demographicEnName", "Grade name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+            case "gender":
+                config.title = "Add gender";
+                config.html = buildInput("demographicEnName", "Gender name") +
+                    buildInput("demographicArName", "Arabic name (optional)") +
+                    buildWeightInput();
+                break;
+        }
+
+        return config;
+    }
+
+    $scope.AddDemographicOption = function (type) {
+        if (type === "state" && (!$scope.ConList || $scope.ConList.length === 0)) {
+            swal({
+                title: "Add country first",
+                text: "You need at least one country before adding a state.",
+                type: "warning",
+                confirmButtonText: "Ok !",
+                confirmButtonColor: "#3598DC"
+            });
+            return;
+        }
+
+        var dialog = buildDemographicDialog(type);
+        swal({
+            title: dialog.title,
+            html: dialog.html,
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Save",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#3598DC",
+            cancelButtonColor: "#BFBFBF",
+            preConfirm: function () {
+                return new Promise(function (resolve, reject) {
+                    var model = dialog.validate();
+                    if (typeof model === "string") {
+                        reject(model);
+                        return;
+                    }
+
+                    resolve(model);
+                });
+            }
+        }).then(function (model) {
+            if (!model) {
+                return;
+            }
+
+            $http.post("/common/common.asmx/SaveDemographicOption", {
+                type: type,
+                companyID: $scope.Survey.CompanyID,
+                model: model
+            }).then(function (result) {
+                if (result.data == true) {
+                    $scope.getAllDemographicWeights().then(function () {
+                        if (tryApplyNewDemographicWeight(type, model)) {
+                            $scope.SaveDemographic();
+                        }
+                        else {
+                            $rootScope.$emit("swAlertSave", {});
+                        }
+                    });
+                }
+                else {
+                    $rootScope.$emit("swAlertError", {});
+                }
+            }, function () {
+                $rootScope.$emit("swAlertError", {});
+            });
+        }, function () { });
     }
 
     /*Startup functions*/

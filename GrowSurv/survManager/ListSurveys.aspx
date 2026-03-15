@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPages/Site.Master" AutoEventWireup="true" CodeBehind="ListSurveys.aspx.cs" Inherits="GrowSurv.survManager.ListSurvies" %>
+<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPages/Site.Master" AutoEventWireup="true" CodeBehind="ListSurveys.aspx.cs" Inherits="GrowSurv.survManager.ListSurvies" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <!-- BEGIN PAGE LEVEL PLUGINS -->
@@ -993,7 +993,10 @@
                                             </li>
                                         </ul>
                                         <div class="tab-content">
-                                            <div class="tab-pane" id="tab_Con">
+                                                                                        <div class="tab-pane active" id="tab_Con">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('country')"><i class="fa fa-plus"></i> Add country</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1011,7 +1014,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Gov">
+                                                                                        <div class="tab-pane" id="tab_Gov">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('state')"><i class="fa fa-plus"></i> Add state</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1029,7 +1035,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Branch">
+                                                                                        <div class="tab-pane" id="tab_Branch">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('branch')"><i class="fa fa-plus"></i> Add branch</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1047,7 +1056,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Department">
+                                                                                        <div class="tab-pane" id="tab_Department">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('department')"><i class="fa fa-plus"></i> Add department</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1065,7 +1077,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Div">
+                                                                                        <div class="tab-pane" id="tab_Div">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('division')"><i class="fa fa-plus"></i> Add division</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1083,7 +1098,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Area">
+                                                                                        <div class="tab-pane" id="tab_Area">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('area')"><i class="fa fa-plus"></i> Add area</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1101,7 +1119,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Age">
+                                                                                        <div class="tab-pane" id="tab_Age">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('age')"><i class="fa fa-plus"></i> Add age group</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1119,7 +1140,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Level">
+                                                                                        <div class="tab-pane" id="tab_Level">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('level')"><i class="fa fa-plus"></i> Add level</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1137,7 +1161,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Jt">
+                                                                                        <div class="tab-pane" id="tab_Jt">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('jobtitle')"><i class="fa fa-plus"></i> Add job title</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1155,7 +1182,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Grade">
+                                                                                        <div class="tab-pane" id="tab_Grade">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('grade')"><i class="fa fa-plus"></i> Add grade</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1173,7 +1203,10 @@
                                                     </tr>
                                                 </table>
                                             </div>
-                                            <div class="tab-pane" id="tab_Gender">
+                                                                                        <div class="tab-pane" id="tab_Gender">
+                                                <div class="clearfix" style="margin-bottom: 15px;">
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('gender')"><i class="fa fa-plus"></i> Add gender</button>
+                                                </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
@@ -1208,3 +1241,4 @@
         </div>
     </div>
 </asp:Content>
+
