@@ -1,4 +1,4 @@
-﻿using GrowSurv.BLL;
+using GrowSurv.BLL;
 using GrowSurv.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -246,69 +246,14 @@ namespace GrowSurv.common
 
             for (int i = 0; i < members.RowCount; i++)
             {
-                try
-                {
-                    var to = members.MemberEmail;
-
-                    if (IsValidEmail(to))
-                    {
-                        string link = BuildSurveyLink(SurveyID, to);
-
-                        using (var msg = new MailMessage())
-                        {
-                            msg.From = new MailAddress(FromEmail);
-                            msg.Subject = mainSurvey.EmailSubject ?? string.Empty;
-                            msg.IsBodyHtml = true;
-                            msg.BodyEncoding = System.Text.Encoding.UTF8;
-                            msg.To.Add(to);
-
-                            msg.Body = string.Format(
-                                HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(),
-                                mainSurvey.EmailBody,
-                                mainSurvey.ArEmailBody,
-                                HttpUtility.HtmlAttributeEncode(link)
-                            );
-
-                            try
-                            {
-                                using (var client = new SmtpClient(SmtpHost, SmtpPort))
-                                {
-                                    client.EnableSsl = SmtpEnableSsl;
-                                    client.Timeout = 10000;
-                                    client.UseDefaultCredentials = false;
-                                    client.Credentials = new NetworkCredential(SmtpUser, SmtpPass);
-
-                                    client.Send(msg);
-                                }
-
-                            }
-                            catch (SmtpException ex)
-                            {
-                                allOk = false;
-                                // log ex.StatusCode + ex.Message + ex.InnerException?.Message
-                            }
-                            catch (Exception ex)
-                            {
-                                allOk = false;
-                                // log ex.Message + ex.InnerException?.Message
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // TODO: log exception details somewhere (db/eventlog/file)
+                if (!TrySendSurveyEmail(members.MemberEmail, mainSurvey, "PublishSurvey"))
                     allOk = false;
-                }
-                finally
-                {
-                    members.MoveNext();
-                }
+
+                members.MoveNext();
             }
 
             SetContentResult(allOk);
         }
-
         [WebMethod]
         public void SendEmailForAMember(int memberID, int surveyID)
         {
@@ -317,51 +262,18 @@ namespace GrowSurv.common
                 SurveyMember member = new SurveyMember();
                 member.LoadByPrimaryKey(memberID);
 
-                if (!IsValidEmail(member.MemberEmail))
-                {
-                    SetContentResult(false);
-                    return;
-                }
-
                 Survey mainSurvey = new Survey();
                 mainSurvey.LoadByPrimaryKey(surveyID);
 
-                string link = BuildSurveyLink(surveyID, member.MemberEmail);
-
-                using (var msg = new MailMessage())
-                {
-                    msg.From = new MailAddress(FromEmail);
-                    msg.Subject = mainSurvey.EmailSubject ?? string.Empty;
-                    msg.IsBodyHtml = true;
-                    msg.BodyEncoding = System.Text.Encoding.UTF8;
-                    msg.To.Add(member.MemberEmail);
-
-                    msg.Body = string.Format(
-                        HttpContext.GetGlobalResourceObject("General", "EmailTemplate").ToString(),
-                        mainSurvey.EmailBody,
-                        mainSurvey.ArEmailBody,
-                        HttpUtility.HtmlAttributeEncode(link)
-                    );
-
-                    using (var client = new SmtpClient(SmtpHost, SmtpPort))
-                    {
-                        client.EnableSsl = SmtpEnableSsl;
-                        client.UseDefaultCredentials = false;
-                        client.Credentials = new System.Net.NetworkCredential(SmtpUser, SmtpPass);
-
-                        client.Send(msg);
-                    }
-                }
-
-                SetContentResult(true);
+                bool sent = TrySendSurveyEmail(member.MemberEmail, mainSurvey, "SendEmailForAMember");
+                SetContentResult(sent);
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: log exception details somewhere (db/eventlog/file)
+                LogMailFailure("SendEmailForAMember", string.Empty, surveyID, BuildMailFailureMessage(ex));
                 SetContentResult(false);
             }
         }
-
         [WebMethod]
         public void DuplicateSurvey(int SurveyID)
         {
@@ -1581,13 +1493,20 @@ namespace GrowSurv.common
         [WebMethod]
         public void SaveMail(SurveyMemberModel model)
         {
+            string normalizedEmail = NormalizeEmail(model.MemberEmail);
+            if (!IsValidEmail(normalizedEmail))
+            {
+                SetContentResult(false);
+                return;
+            }
+
             SurveyMember cats = new SurveyMember();
             if (model.MemberID == 0)
                 cats.AddNew();
             else
                 cats.LoadByPrimaryKey(model.MemberID);
 
-            cats.MemberEmail = model.MemberEmail == null ? "" : model.MemberEmail;
+            cats.MemberEmail = normalizedEmail;
             cats.SurveyID = model.SurveyID;
             cats.Save();
             SetContentResult(true);
@@ -2033,19 +1952,140 @@ namespace GrowSurv.common
             return clearText;
         }
 
+        private string NormalizeEmail(string email)
+        {
+            return (email ?? string.Empty).Trim();
+        }
+
+        private bool TrySendSurveyEmail(string recipientEmail, Survey survey, string operationName)
+        {
+            string normalizedEmail = NormalizeEmail(recipientEmail);
+            int surveyId = survey == null ? 0 : survey.SurveyID;
+
+            if (!IsValidEmail(normalizedEmail))
+            {
+                LogMailFailure(operationName, normalizedEmail, surveyId, "Invalid recipient email.");
+                return false;
+            }
+
+            try
+            {
+                string link = BuildSurveyLink(surveyId, normalizedEmail);
+
+                using (var msg = CreateSurveyMailMessage(survey, normalizedEmail, link))
+                using (var client = CreateSmtpClient())
+                {
+                    client.Send(msg);
+                }
+
+                return true;
+            }
+            catch (SmtpException ex)
+            {
+                LogMailFailure(operationName, normalizedEmail, surveyId, BuildMailFailureMessage(ex));
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LogMailFailure(operationName, normalizedEmail, surveyId, BuildMailFailureMessage(ex));
+                return false;
+            }
+        }
+
+        private MailMessage CreateSurveyMailMessage(Survey survey, string recipientEmail, string link)
+        {
+            string template = Convert.ToString(HttpContext.GetGlobalResourceObject("General", "EmailTemplate")) ?? "{0}{1}{2}";
+            MailAddress fromAddress = new MailAddress(FromEmail, "GrowSurv");
+            MailAddress senderAddress = new MailAddress(SmtpUser, "GrowSurv");
+
+            var msg = new MailMessage();
+            msg.From = fromAddress;
+            msg.Sender = senderAddress;
+            msg.ReplyToList.Add(fromAddress);
+            msg.Subject = survey == null ? string.Empty : (survey.EmailSubject ?? string.Empty);
+            msg.SubjectEncoding = Encoding.UTF8;
+            msg.HeadersEncoding = Encoding.UTF8;
+            msg.BodyEncoding = Encoding.UTF8;
+            msg.IsBodyHtml = true;
+            msg.Priority = MailPriority.Normal;
+            msg.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure | DeliveryNotificationOptions.Delay;
+            msg.To.Add(recipientEmail);
+            msg.Body = string.Format(
+                template,
+                survey == null ? string.Empty : (survey.EmailBody ?? string.Empty),
+                survey == null ? string.Empty : (survey.ArEmailBody ?? string.Empty),
+                HttpUtility.HtmlAttributeEncode(link)
+            );
+            msg.Headers.Add("X-Mailer", "GrowSurv");
+            msg.Headers.Add("X-Auto-Response-Suppress", "OOF, DR, RN, NRN, AutoReply");
+
+            return msg;
+        }
+
+        private SmtpClient CreateSmtpClient()
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
+            var client = new SmtpClient(SmtpHost, SmtpPort);
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.EnableSsl = SmtpEnableSsl;
+            client.Timeout = 20000;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(SmtpUser, SmtpPass);
+
+            return client;
+        }
+
+        private string BuildMailFailureMessage(Exception ex)
+        {
+            SmtpException smtpException = ex as SmtpException;
+            if (smtpException != null)
+                return string.Format("SMTP ({0}): {1}{2}", smtpException.StatusCode, smtpException.Message, smtpException.InnerException == null ? string.Empty : " | Inner: " + smtpException.InnerException.Message);
+
+            return ex.Message + (ex.InnerException == null ? string.Empty : " | Inner: " + ex.InnerException.Message);
+        }
+
+        private void LogMailFailure(string operationName, string recipientEmail, int surveyId, string message)
+        {
+            try
+            {
+                string appDataPath = HttpContext.Current.Server.MapPath("~/App_Data");
+                Directory.CreateDirectory(appDataPath);
+
+                string logPath = Path.Combine(appDataPath, "mail-errors.log");
+                string logEntry = string.Format(
+                    "{0:u} | {1} | SurveyID={2} | Recipient={3} | {4}{5}",
+                    DateTime.UtcNow,
+                    operationName,
+                    surveyId,
+                    string.IsNullOrWhiteSpace(recipientEmail) ? "<empty>" : recipientEmail,
+                    message,
+                    Environment.NewLine
+                );
+
+                File.AppendAllText(logPath, logEntry, Encoding.UTF8);
+            }
+            catch
+            {
+            }
+        }
+
         private bool IsValidEmail(string email)
         {
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
+                string normalizedEmail = NormalizeEmail(email);
+                if (string.IsNullOrWhiteSpace(normalizedEmail))
+                    return false;
+
+                var addr = new System.Net.Mail.MailAddress(normalizedEmail);
+                return string.Equals(addr.Address, normalizedEmail, StringComparison.OrdinalIgnoreCase);
             }
             catch
             {
                 return false;
             }
         }
-
         [WebMethod]
         public void SaveDemographicOption(string type, int companyID, object model)
         {

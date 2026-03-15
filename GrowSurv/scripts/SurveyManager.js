@@ -140,7 +140,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         if ($scope.SelectedCompany != 0)
             $scope.Survey.CompanyID = $scope.SelectedCompany;
         $http.post("/common/common.asmx/SaveSurvey", { model: $scope.Survey }).then(function (Result) {
-            if (Result.status == 200) {
+            if (Result.data == true) {
                 $rootScope.$emit("swAlertSave", {});
                 if ($scope.EditMode == false) {
                     $scope.EditMode = true;
@@ -166,7 +166,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                    $scope.PublishStatus.PublishingToAll = true;
                    $scope.PublishStatus.SurveyID = SurveyID;
                    $http.post("/common/common.asmx/PublishSurvey", { SurveyID: SurveyID }).then(function (Result) {
-                       if (Result.status == 200) {
+                       if (Result.data == true) {
                            $rootScope.$emit("swAlertPublish", {});
                        }
                        else
@@ -255,7 +255,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     };
     $scope.duplicateQuestion = function (question) {
         $http.post("/common/common.asmx/duplicateQuestion", { QuestionID: question.QuestionID }).then(function (Result) {
-            if (Result.status == 200) {
+            if (Result.data == true) {
                 $scope.getAllQuestions();
                 $rootScope.$emit("swAlertSave", {});
             }
@@ -293,7 +293,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.SaveQuestion = function () {
         $scope.Question.SurveyID = $scope.Survey.SurveyID;
         $http.post("/common/common.asmx/SaveQuestion", { model: $scope.Question }).then(function (Result) {
-            if (Result.status == 200) {
+            if (Result.data == true) {
                 $scope.getAllQuestions();
                 $scope.CancelQuestion();
                 $rootScope.$emit("swAlertSave", {});
@@ -308,7 +308,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     }
     $scope.UpdateQuestionsOrders = function () {        
         $http.post("/common/common.asmx/UpdateQuestionsOrders", { model: $scope.Questions }).then(function (Result) {
-            if (Result.status == 200) {
+            if (Result.data == true) {
                 $scope.getAllQuestions();                
                 $rootScope.$emit("swAlertSave", {});
             }
@@ -326,7 +326,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                 function() {
                     $scope.Question = model;
                     $http.post("/common/common.asmx/deleteQuestion", { QuestionID: $scope.Question.QuestionID }).then(function (Result) {
-                        if (Result.status == 200) {
+                        if (Result.data == true) {
                             $scope.getAllQuestions();
                             $rootScope.$emit("swAlertSave", {});
                         }
@@ -451,7 +451,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         if (!$scope.Question.QuestionID) {
             $scope.Question.SurveyID = $scope.Survey.SurveyID;
             $http.post("/common/common.asmx/SaveQuestion", { model: $scope.Question }).then(function (Result) {
-                if (Result.status == 200) {
+                if (Result.data == true) {
                     $scope.Question = Result.data;
                     if ($scope.QuestionAnswer.EnName) {
                         $scope.QuestionAnswer.QuestionID = $scope.Question.QuestionID;
@@ -535,7 +535,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         $scope.SubQuestion.ParentQuestionID = $scope.Question.QuestionID;
         $scope.SubQuestion.SurveyID = $scope.Survey.SurveyID;
         $http.post("/common/common.asmx/SaveQuestion", { model: $scope.SubQuestion }).then(function (Result) {
-            if (Result.status == 200) {
+            if (Result.data == true) {
                 $scope.getSubQuestionByQuestionID();
                 $scope.CancelSubQuestion();
                 $rootScope.$emit("swAlertSave", {});
@@ -581,7 +581,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     //    if (!$scope.SubQuestion.QuestionID) {
     //        $scope.SubQuestion.ParentQuestionID = $scope.Question.QuestionID;
     //        $http.post("/common/common.asmx/SaveQuestion", { model: $scope.SubQuestion }).then(function (Result) {
-    //            if (Result.status == 200) {
+    //            if (Result.data == true) {
     //                $scope.SubQuestion = Result.data;
     //                if ($scope.SubQuestionAnswer.EnName) {
     //                    $scope.SubQuestionAnswer.QuestionID = $scope.SubQuestion.QuestionID;
@@ -857,7 +857,12 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                        //HideMasterShowDetails("#Listsurveys", "#SurveyDetails");
                        $scope.PublishStatus.MemberID = 0;
                        $scope.PublishStatus.PublishingToMember = false;
-                       $rootScope.$emit("swAlertPublish", {});
+                       if (Result.data == true) {
+                           $rootScope.$emit("swAlertPublish", {});
+                       }
+                       else {
+                           $rootScope.$emit("swAlertError", {});
+                       }
 
                    }, function () {
                        $scope.PublishStatus.MemberID = 0;
