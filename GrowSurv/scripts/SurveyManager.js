@@ -46,6 +46,18 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.QuestionsToImport = [];
     $scope.BankQuestionsToImport = [];
 
+    function hasHttpSuccess(result) {
+        return result && result.status === 200;
+    }
+
+    function hasSurveyResult(result) {
+        return hasHttpSuccess(result) && result.data && result.data.SurveyID;
+    }
+
+    function hasQuestionResult(result) {
+        return hasHttpSuccess(result) && result.data && result.data.QuestionID;
+    }
+
     /* Main Functions */
     $scope.getAllSurveys = function () {
         //$scope.SelectedCompany = document.getElementById("CurrentCompany").value;
@@ -140,7 +152,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         if ($scope.SelectedCompany != 0)
             $scope.Survey.CompanyID = $scope.SelectedCompany;
         $http.post("/common/common.asmx/SaveSurvey", { model: $scope.Survey }).then(function (Result) {
-            if (Result.data == true) {
+            if (hasSurveyResult(Result)) {
                 $rootScope.$emit("swAlertSave", {});
                 if ($scope.EditMode == false) {
                     $scope.EditMode = true;
@@ -293,7 +305,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.SaveQuestion = function () {
         $scope.Question.SurveyID = $scope.Survey.SurveyID;
         $http.post("/common/common.asmx/SaveQuestion", { model: $scope.Question }).then(function (Result) {
-            if (Result.data == true) {
+            if (hasQuestionResult(Result)) {
                 $scope.getAllQuestions();
                 $scope.CancelQuestion();
                 $rootScope.$emit("swAlertSave", {});
@@ -308,7 +320,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     }
     $scope.UpdateQuestionsOrders = function () {        
         $http.post("/common/common.asmx/UpdateQuestionsOrders", { model: $scope.Questions }).then(function (Result) {
-            if (Result.data == true) {
+            if (hasHttpSuccess(Result)) {
                 $scope.getAllQuestions();                
                 $rootScope.$emit("swAlertSave", {});
             }
@@ -451,7 +463,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         if (!$scope.Question.QuestionID) {
             $scope.Question.SurveyID = $scope.Survey.SurveyID;
             $http.post("/common/common.asmx/SaveQuestion", { model: $scope.Question }).then(function (Result) {
-                if (Result.data == true) {
+                if (hasQuestionResult(Result)) {
                     $scope.Question = Result.data;
                     if ($scope.QuestionAnswer.EnName) {
                         $scope.QuestionAnswer.QuestionID = $scope.Question.QuestionID;
@@ -535,7 +547,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         $scope.SubQuestion.ParentQuestionID = $scope.Question.QuestionID;
         $scope.SubQuestion.SurveyID = $scope.Survey.SurveyID;
         $http.post("/common/common.asmx/SaveQuestion", { model: $scope.SubQuestion }).then(function (Result) {
-            if (Result.data == true) {
+            if (hasQuestionResult(Result)) {
                 $scope.getSubQuestionByQuestionID();
                 $scope.CancelSubQuestion();
                 $rootScope.$emit("swAlertSave", {});
