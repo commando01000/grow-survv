@@ -73,7 +73,7 @@ namespace GrowSurv.common
                     IsDivisionMandatory = survs.IsColumnNull("IsDivisionMandatory") ? false : survs.IsDivisionMandatory,
                     IsDurationMandatory = survs.IsColumnNull("IsDurationMandatory") ? false : survs.IsDurationMandatory,
                     IsGenderMandatory = survs.IsColumnNull("IsGenderMandatory") ? false : survs.IsGenderMandatory,
-                    IsGradeMandatory = survs.IsColumnNull("IsGenderMandatory") ? false : survs.IsGenderMandatory,
+                    IsGradeMandatory = survs.IsColumnNull("IsGradeMandatory") ? false : survs.IsGradeMandatory,
                     IsJobTitleMandatory = survs.IsColumnNull("IsJobTitleMandatory") ? false : survs.IsJobTitleMandatory,
                     IsLevelMandatory = survs.IsColumnNull("IsLevelMandatory") ? false : survs.IsLevelMandatory,
                     IsRecentPromotionDateMandatory = survs.IsColumnNull("IsRecentPromotionDateMandatory") ? false : survs.IsRecentPromotionDateMandatory,
@@ -119,7 +119,7 @@ namespace GrowSurv.common
                 IsDivisionMandatory = survs.IsColumnNull("IsDivisionMandatory") ? false : survs.IsDivisionMandatory,
                 IsDurationMandatory = survs.IsColumnNull("IsDurationMandatory") ? false : survs.IsDurationMandatory,
                 IsGenderMandatory = survs.IsColumnNull("IsGenderMandatory") ? false : survs.IsGenderMandatory,
-                IsGradeMandatory = survs.IsColumnNull("IsGenderMandatory") ? false : survs.IsGenderMandatory,
+                IsGradeMandatory = survs.IsColumnNull("IsGradeMandatory") ? false : survs.IsGradeMandatory,
                 IsJobTitleMandatory = survs.IsColumnNull("IsJobTitleMandatory") ? false : survs.IsJobTitleMandatory,
                 IsLevelMandatory = survs.IsColumnNull("IsLevelMandatory") ? false : survs.IsLevelMandatory,
                 IsRecentPromotionDateMandatory = survs.IsColumnNull("IsRecentPromotionDateMandatory") ? false : survs.IsRecentPromotionDateMandatory,
@@ -1088,7 +1088,7 @@ namespace GrowSurv.common
         }
         [WebMethod]
         public void submitDemographicData(int SurveyID, string member, int conId, int govId, int areaID, int branchID, int departmentID,
-                        int divisionID, int level, int grade, int jobTitle, int ageGroup, int gender, int durationInSeconds)
+                        int divisionID, int level, int grade, int jobTitle, int ageGroup, int gender, string hiringDate, string recentPromotionDate, int durationInSeconds)
         {
             SurveyMember _member = new SurveyMember();
             if (_member.GetMemberBySurveyIDAndMemberEmail(SurveyID, member))
@@ -1115,6 +1115,18 @@ namespace GrowSurv.common
                     _member.AgeGroupID = ageGroup;
                 if (gender != 0)
                     _member.GenderID = gender;
+                DateTime parsedHiringDate;
+                if (!string.IsNullOrWhiteSpace(hiringDate) &&
+                    DateTime.TryParseExact(hiringDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedHiringDate))
+                {
+                    _member.HiringDate = parsedHiringDate;
+                }
+                DateTime parsedRecentPromotionDate;
+                if (!string.IsNullOrWhiteSpace(recentPromotionDate) &&
+                    DateTime.TryParseExact(recentPromotionDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedRecentPromotionDate))
+                {
+                    _member.RecentPromotionDate = parsedRecentPromotionDate;
+                }
                 if (_member.IsColumnNull(SurveyMember.ColumnNames.Duration))
                 {
                     _member.Duration = new DateTime(1900, 1, 1).AddSeconds(durationInSeconds);

@@ -205,6 +205,24 @@
                             <asp:HiddenField ID="uiHiddenFieldGender" Value="0" runat="server" />
                         </div>
                     </div>
+                    <div class="col-md-12 clearfix padding-tb-10">
+                        <div class="col-md-3" runat="server" id="hiringDateLabelDiv">
+                            <asp:Label ID="uiLabelHiringDate" runat="server"></asp:Label>
+                        </div>
+                        <div class="col-md-3" runat="server" id="hiringDateInputDiv">
+                            <asp:TextBox CssClass="form-control" ID="uiTextBoxHiringDate" runat="server" TextMode="Date"></asp:TextBox>
+                            <asp:HiddenField ID="uiHiddenFieldHiringDate" Value="0" runat="server" />
+                        </div>
+                    </div>
+                    <div class="col-md-12 clearfix padding-tb-10">
+                        <div class="col-md-3" runat="server" id="recentPromotionLabelDiv">
+                            <asp:Label ID="uiLabelRecentPromotionDate" runat="server"></asp:Label>
+                        </div>
+                        <div class="col-md-3" runat="server" id="recentPromotionInputDiv">
+                            <asp:TextBox CssClass="form-control" ID="uiTextBoxRecentPromotionDate" runat="server" TextMode="Date"></asp:TextBox>
+                            <asp:HiddenField ID="uiHiddenFieldRecentPromotionDate" Value="0" runat="server" />
+                        </div>
+                    </div>
                     <div class="col-md-12">
                         <div class="col-md-3"></div>
                         <div class="col-md-3">
@@ -374,7 +392,7 @@
 
                 });
 
-                var conID = 0, govID = 0, areaID = 0, branchID = 0, departmentID = 0, divisionID = 0, level = 0, grade = 0, jobTitle = 0, ageGroup = 0, gender = 0;
+                var conID = 0, govID = 0, areaID = 0, branchID = 0, departmentID = 0, divisionID = 0, level = 0, grade = 0, jobTitle = 0, ageGroup = 0, gender = 0, hiringDate = "", recentPromotionDate = "";
                 if ($('#<%= uiDropDownListCon.ClientID%>').val() != "")
                     conID = $('#<%= uiDropDownListCon.ClientID %>').val();
                 if ($('#<%= uiDropDownListGov.ClientID%>').val() != "")
@@ -397,13 +415,17 @@
                     ageGroup = $('#<%= uiDropDownListAgeGroup.ClientID %>').val();
                 if ($('#<%= uiDropDownListGender.ClientID%>').val() != "")
                     gender = $('#<%= uiDropDownListGender.ClientID %>').val();
+                if ($('#<%= uiTextBoxHiringDate.ClientID %>').val() != "")
+                    hiringDate = $('#<%= uiTextBoxHiringDate.ClientID %>').val();
+                if ($('#<%= uiTextBoxRecentPromotionDate.ClientID %>').val() != "")
+                    recentPromotionDate = $('#<%= uiTextBoxRecentPromotionDate.ClientID %>').val();
 
                 $.ajax({
                     type: 'POST',
                     url: '../common/common.asmx/submitDemographicData',
                     data: JSON.stringify({
                         SurveyID: surveyid, member: membermail, conId: conID, govId: govID, areaID: areaID, branchID: branchID, departmentID: departmentID,
-                        divisionID: divisionID, level: level, grade: grade, jobTitle: jobTitle, ageGroup: ageGroup, gender: gender, durationInSeconds: survey.timeSpent
+                        divisionID: divisionID, level: level, grade: grade, jobTitle: jobTitle, ageGroup: ageGroup, gender: gender, hiringDate: hiringDate, recentPromotionDate: recentPromotionDate, durationInSeconds: survey.timeSpent
                     }),
                     contentType: 'application/json',
                     dataType: 'application/json'
@@ -443,6 +465,10 @@
                         errors += "Please select age group" + "<br />";
                     if ($('#<%= uiHiddenFieldGender.ClientID %>').val() != "0" && $('#<%= uiDropDownListGender.ClientID%>').val() == "")
                         errors += "Please select gender" + "<br />";
+                    if ($('#<%= uiHiddenFieldHiringDate.ClientID %>').val() != "0" && $('#<%= uiTextBoxHiringDate.ClientID%>').val() == "")
+                        errors += "Please select hiring date" + "<br />";
+                    if ($('#<%= uiHiddenFieldRecentPromotionDate.ClientID %>').val() != "0" && $('#<%= uiTextBoxRecentPromotionDate.ClientID%>').val() == "")
+                        errors += "Please select recent promotion date" + "<br />";
                 }
                 else {
                     $('#modalTitle').html("خطأ");
@@ -468,6 +494,10 @@
                         errors += "من فضلك إختر الفئة العمرية" + "<br />";
                     if ($('#<%= uiHiddenFieldGender.ClientID %>').val() != "0" && $('#<%= uiDropDownListGender.ClientID%>').val() == "")
                         errors += "من فضلك إختر النوع" + "<br />";
+                    if ($('#<%= uiHiddenFieldHiringDate.ClientID %>').val() != "0" && $('#<%= uiTextBoxHiringDate.ClientID%>').val() == "")
+                        errors += "من فضلك إختر تاريخ التعيين" + "<br />";
+                    if ($('#<%= uiHiddenFieldRecentPromotionDate.ClientID %>').val() != "0" && $('#<%= uiTextBoxRecentPromotionDate.ClientID%>').val() == "")
+                        errors += "من فضلك إختر تاريخ آخر ترقية" + "<br />";
 
                 }
                 $('#modalText').html(errors);

@@ -20,6 +20,7 @@ namespace GrowSurv.Models
         public int GenderID { get; set; }
         public decimal Age { get; set; }
         public DateTime Duration { get; set; }
+        public DateTime HiringDate { get; set; }
         public  DateTime RecentPromotionDate { get; set; }
         public bool IsSurveySubmited { get; set; }
 

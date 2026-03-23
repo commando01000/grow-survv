@@ -12,7 +12,8 @@ namespace GrowSurv.doSurvey
 {
     public partial class index : System.Web.UI.Page
     {
-        public string Lang {
+        public string Lang
+        {
             get
             {
                 if (Session["_CurrentLang"] != null)
@@ -124,15 +125,15 @@ namespace GrowSurv.doSurvey
             string member = TryDecryptQueryStringValue("mail");
             SurveyMember mem = new SurveyMember();
             mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, member);
-            
+
             Survey survey = new Survey();
             survey.LoadByPrimaryKey(surveyID);
             uiLabelCon.Text = (Lang == "en" ? "Country" : "البلد") + (survey.IsCountryMandatory ? "*" : "");
             uiHiddenFieldCon.Value = survey.IsCountryMandatory ? "1" : "0";
             conDiv.Attributes.CssStyle.Add("display", survey.IsCountryMandatory ? "block" : "none");
-            
 
-            uiLabelGov.Text = (Lang == "en" ?  "State" : "المحافظة") + (survey.IsGovernrateMandatory ? "*" : "");
+
+            uiLabelGov.Text = (Lang == "en" ? "State" : "المحافظة") + (survey.IsGovernrateMandatory ? "*" : "");
             uiHiddenFieldGov.Value = survey.IsGovernrateMandatory ? "1" : "0";
             govLabelDiv.Attributes.CssStyle.Add("display", survey.IsGovernrateMandatory ? "block" : "none");
             govDDLDiv.Attributes.CssStyle.Add("display", survey.IsGovernrateMandatory ? "block" : "none");
@@ -182,7 +183,17 @@ namespace GrowSurv.doSurvey
             genLabelDiv.Attributes.CssStyle.Add("display", survey.IsGenderMandatory ? "block" : "none");
             genDDLDiv.Attributes.CssStyle.Add("display", survey.IsGenderMandatory ? "block" : "none");
 
-            uiLiteralDemographicHeader.Text = Lang == "en" ?  survey.EnHeader : survey.ArHeader;
+            uiLabelHiringDate.Text = (Lang == "en" ? "Hiring Date" : "تاريخ التعيين") + (survey.IsDurationMandatory ? "*" : "");
+            uiHiddenFieldHiringDate.Value = survey.IsDurationMandatory ? "1" : "0";
+            hiringDateLabelDiv.Attributes.CssStyle.Add("display", survey.IsDurationMandatory ? "block" : "none");
+            hiringDateInputDiv.Attributes.CssStyle.Add("display", survey.IsDurationMandatory ? "block" : "none");
+
+            uiLabelRecentPromotionDate.Text = (Lang == "en" ? "Recent Promotion Date" : "تاريخ آخر ترقية") + (survey.IsRecentPromotionDateMandatory ? "*" : "");
+            uiHiddenFieldRecentPromotionDate.Value = survey.IsRecentPromotionDateMandatory ? "1" : "0";
+            recentPromotionLabelDiv.Attributes.CssStyle.Add("display", survey.IsRecentPromotionDateMandatory ? "block" : "none");
+            recentPromotionInputDiv.Attributes.CssStyle.Add("display", survey.IsRecentPromotionDateMandatory ? "block" : "none");
+
+            uiLiteralDemographicHeader.Text = Lang == "en" ? survey.EnHeader : survey.ArHeader;
             uiLiteralHeader.Text = Lang == "en" ? survey.EnHeader : survey.ArHeader;
             uiLiteralFooter.Text = Lang == "en" ? survey.EnFooter : survey.ArFooter;
 
@@ -207,7 +218,7 @@ namespace GrowSurv.doSurvey
             uiDropDownListGov.DataTextField = (Lang == "en" ? Governrate.ColumnNames.EnName : Governrate.ColumnNames.ArName);
             uiDropDownListGov.DataValueField = Governrate.ColumnNames.GovernrateID;
             uiDropDownListGov.DataBind();
-            if(Lang == "en")
+            if (Lang == "en")
                 uiDropDownListGov.Items.Insert(0, new ListItem("Select State", ""));
             else
                 uiDropDownListGov.Items.Insert(0, new ListItem("إختر المحافظة", ""));
@@ -227,7 +238,7 @@ namespace GrowSurv.doSurvey
             Branch branches = new Branch();
             branches.GetActiveListByCompanyID(survey.CompanyID);
             uiDropDownListBranch.DataSource = branches.DefaultView;
-            uiDropDownListBranch.DataTextField = (Lang == "en" ? Branch.ColumnNames.NameEn  : Branch.ColumnNames.NameAr);
+            uiDropDownListBranch.DataTextField = (Lang == "en" ? Branch.ColumnNames.NameEn : Branch.ColumnNames.NameAr);
             uiDropDownListBranch.DataValueField = Branch.ColumnNames.BranchID;
             uiDropDownListBranch.DataBind();
             if (Lang == "en")
@@ -336,6 +347,10 @@ namespace GrowSurv.doSurvey
                     uiDropDownListJobTitle.SelectedValue = mem.JobTitleID.ToString();
                 if (!mem.IsColumnNull(SurveyMember.ColumnNames.AgeGroupID))
                     uiDropDownListAgeGroup.SelectedValue = mem.AgeGroupID.ToString();
+                if (!mem.IsColumnNull(SurveyMember.ColumnNames.HiringDate))
+                    uiTextBoxHiringDate.Text = mem.HiringDate.ToString("yyyy-MM-dd");
+                if (!mem.IsColumnNull(SurveyMember.ColumnNames.RecentPromotionDate))
+                    uiTextBoxRecentPromotionDate.Text = mem.RecentPromotionDate.ToString("yyyy-MM-dd");
             }
         }
 
@@ -390,11 +405,11 @@ namespace GrowSurv.doSurvey
                 MainSurvey.Visible = false;
             }
             langSelector.Visible = false;
-            
+
             uiLinkButtonMoveNextServer.Text = "إستمرار";
             //uiLinkButtonMoveNext.InnerText = "إستمرار";
             lnkCSS.Href = "../assets/global/plugins/bootstrap/css/bootstrap-rtl.min.css";
-            PreSurvey.Attributes["class"]= "rtl font-JF clearfix";
+            PreSurvey.Attributes["class"] = "rtl font-JF clearfix";
             MainSurvey.Attributes["class"] = "rtl font-JF clearfix";
             BindSurveyInfo(SurveyID);
         }
@@ -415,9 +430,9 @@ namespace GrowSurv.doSurvey
                 PreSurvey.Visible = true;
                 MainSurvey.Visible = false;
             }
-            
+
             langSelector.Visible = false;
-            
+
             //uiLinkButtonMoveNext.InnerText = "Continue";
             uiLinkButtonMoveNextServer.Text = "Continue";
 
