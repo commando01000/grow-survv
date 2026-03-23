@@ -1922,10 +1922,17 @@ namespace GrowSurv.common
         {
             var baseUri = new Uri(GetSurveyBaseUrl(), UriKind.Absolute);
             var builder = new UriBuilder(baseUri);
+            
+            // HttpUtility.ParseQueryString returns a special NameValueCollection (HttpValueCollection)
+            // that handles URL encoding automatically when .ToString() is called.
             NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
 
-            query["sid"] = HttpUtility.UrlEncode(Encrypt(surveyId.ToString()));
-            query["mail"] = string.IsNullOrEmpty(memberEmail) ? string.Empty : HttpUtility.UrlEncode(Encrypt(memberEmail));
+            // Do NOT use HttpUtility.UrlEncode here, as it will cause double encoding when query.ToString() is called.
+            query["sid"] = Encrypt(surveyId.ToString());
+            if (!string.IsNullOrEmpty(memberEmail))
+            {
+                query["mail"] = Encrypt(memberEmail);
+            }
 
             builder.Query = query.ToString();
             return builder.Uri.AbsoluteUri;
@@ -1933,11 +1940,18 @@ namespace GrowSurv.common
 
         private string GetSurveyBaseUrl()
         {
+            // If we have a hardcoded base URL, use it as a fallback but try to detect current host
             HttpRequest request = HttpContext.Current?.Request;
             if (request != null && request.Url != null)
             {
-                string scheme = request.IsSecureConnection ? Uri.UriSchemeHttps : request.Url.Scheme;
-                return string.Format("{0}://{1}{2}", scheme, request.Url.Authority, VirtualPathUtility.ToAbsolute("~/doSurvey/index.aspx"));
+                // Many shared hosts/load balancers use X-Forwarded-Proto
+                string scheme = request.Headers["X-Forwarded-Proto"] ?? 
+                               (request.IsSecureConnection ? Uri.UriSchemeHttps : request.Url.Scheme);
+                
+                return string.Format("{0}://{1}{2}", 
+                    scheme, 
+                    request.Url.Authority, 
+                    VirtualPathUtility.ToAbsolute("~/doSurvey/index.aspx"));
             }
 
             return SurveyBaseUrl;
