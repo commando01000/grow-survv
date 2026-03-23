@@ -38,8 +38,8 @@ namespace GrowSurv.common
         // === Static SMTP Settings (TEMP) ===
         // ⚠️ Do NOT commit real password to git.
         private static readonly string SmtpHost = "mail5013.site4now.net";
-        private static readonly int SmtpPort = 587; // or 465 if 587 fails
-        private static readonly bool SmtpEnableSsl = true;
+        private static readonly int SmtpPort = 25; // Port 25 is standard for relaying on SmarterASP.net
+        private static readonly bool SmtpEnableSsl = false; // Port 25 usually does not use SSL
 
         private static readonly string SmtpUser = "survey@tedorcg.com";
         private static readonly string SmtpPass = "Tedorcg@01222468078"; // insert locally
@@ -2008,11 +2008,9 @@ namespace GrowSurv.common
         {
             string template = Convert.ToString(HttpContext.GetGlobalResourceObject("General", "EmailTemplate")) ?? "{0}{1}{2}";
             MailAddress fromAddress = new MailAddress(FromEmail, "GrowSurv");
-            MailAddress senderAddress = new MailAddress(SmtpUser, "GrowSurv");
 
             var msg = new MailMessage();
             msg.From = fromAddress;
-            msg.Sender = senderAddress;
             msg.ReplyToList.Add(fromAddress);
             msg.Subject = survey == null ? string.Empty : (survey.EmailSubject ?? string.Empty);
             msg.SubjectEncoding = Encoding.UTF8;
@@ -2036,7 +2034,11 @@ namespace GrowSurv.common
 
         private SmtpClient CreateSmtpClient()
         {
+            // Support TLS 1.0, 1.1, and 1.2
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            
+            // Override certificate validation to allow self-signed certificates (common on shared mail servers)
+            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
             var client = new SmtpClient(SmtpHost, SmtpPort);
             client.DeliveryMethod = SmtpDeliveryMethod.Network;
