@@ -2152,10 +2152,67 @@ namespace GrowSurv.common
             }
         }
 
+        [WebMethod]
+        public void DeleteDemographicOption(string type, int optionId)
+        {
+            try
+            {
+                switch ((type ?? string.Empty).Trim().ToLowerInvariant())
+                {
+                    case "country":
+                        SoftDeleteCountry(optionId);
+                        break;
+                    case "state":
+                        SoftDeleteGovernrate(optionId);
+                        break;
+                    case "branch":
+                        SoftDeleteBranch(optionId);
+                        break;
+                    case "department":
+                        SoftDeleteDepartment(optionId);
+                        break;
+                    case "division":
+                        SoftDeleteDivision(optionId);
+                        break;
+                    case "area":
+                        SoftDeleteArea(optionId);
+                        break;
+                    case "age":
+                        SoftDeleteAgeGroup(optionId);
+                        break;
+                    case "level":
+                        SoftDeleteLevel(optionId);
+                        break;
+                    case "jobtitle":
+                        SoftDeleteJobTitle(optionId);
+                        break;
+                    case "grade":
+                        SoftDeleteGrade(optionId);
+                        break;
+                    case "gender":
+                        DeleteGender(optionId);
+                        break;
+                    default:
+                        SetContentResult(false);
+                        return;
+                }
+
+                SetContentResult(true);
+            }
+            catch
+            {
+                SetContentResult(false);
+            }
+        }
+
         private void SaveCountryOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "CountryID");
             Country item = new Country();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.EnName = GetRequiredText(data, "EnName");
             item.ArName = GetOptionalText(data, "ArName", item.EnName);
             item.CompanyID = companyID;
@@ -2165,10 +2222,14 @@ namespace GrowSurv.common
 
         private void SaveGovernrateOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "GovernrateID");
             int countryId = GetRequiredInt(data, "CountryID");
 
             Governrate item = new Governrate();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.EnName = GetRequiredText(data, "EnName");
             item.ArName = GetOptionalText(data, "ArName", item.EnName);
             item.CompanyID = companyID;
@@ -2179,8 +2240,12 @@ namespace GrowSurv.common
 
         private void SaveBranchOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "BranchID");
             Branch item = new Branch();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.NameEn = GetRequiredText(data, "EnName");
             item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
             item.CompanyID = companyID;
@@ -2190,8 +2255,12 @@ namespace GrowSurv.common
 
         private void SaveDepartmentOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "DepartmentID");
             Department item = new Department();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.EnName = GetRequiredText(data, "EnName");
             item.ArName = GetOptionalText(data, "ArName", item.EnName);
             item.CompanyID = companyID;
@@ -2201,8 +2270,12 @@ namespace GrowSurv.common
 
         private void SaveDivisionOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "DivisionID");
             Division item = new Division();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.NameEn = GetRequiredText(data, "EnName");
             item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
             item.CompanyID = companyID;
@@ -2212,8 +2285,12 @@ namespace GrowSurv.common
 
         private void SaveAreaOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "AreaID");
             Area item = new Area();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.NameEn = GetRequiredText(data, "EnName");
             item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
             item.CompanyID = companyID;
@@ -2223,6 +2300,7 @@ namespace GrowSurv.common
 
         private void SaveAgeGroupOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "AgeGroupID");
             int startAge = GetRequiredInt(data, "StartAge");
             int endAge = GetRequiredInt(data, "EndAge");
             if (endAge < startAge)
@@ -2230,7 +2308,10 @@ namespace GrowSurv.common
 
             string defaultName = string.Format("{0} - {1}", startAge, endAge);
             AgeGroup item = new AgeGroup();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.StartAge = startAge;
             item.EndAge = endAge;
             item.EnDisplayName = GetOptionalText(data, "EnName", defaultName);
@@ -2242,8 +2323,12 @@ namespace GrowSurv.common
 
         private void SaveLevelOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "LevelID");
             Level item = new Level();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.EnName = GetRequiredText(data, "EnName");
             item.ArName = GetOptionalText(data, "ArName", item.EnName);
             item.CompanyID = companyID;
@@ -2253,8 +2338,12 @@ namespace GrowSurv.common
 
         private void SaveJobTitleOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "JobTitleID");
             JobTitle item = new JobTitle();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.EnName = GetRequiredText(data, "EnName");
             item.ArName = GetOptionalText(data, "ArName", item.EnName);
             item.CompanyID = companyID;
@@ -2264,8 +2353,12 @@ namespace GrowSurv.common
 
         private void SaveGradeOption(int companyID, JObject data)
         {
+            int optionId = GetOptionalInt(data, "GradeID");
             Grade item = new Grade();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.EnName = GetRequiredText(data, "EnName");
             item.ArName = GetOptionalText(data, "ArName", item.EnName);
             item.CompanyID = companyID;
@@ -2275,8 +2368,12 @@ namespace GrowSurv.common
 
         private void SaveGenderOption(JObject data)
         {
+            int optionId = GetOptionalInt(data, "GenderID");
             Gender item = new Gender();
-            item.AddNew();
+            if (optionId > 0)
+                item.LoadByPrimaryKey(optionId);
+            else
+                item.AddNew();
             item.NameEn = GetRequiredText(data, "EnName");
             item.NameAr = GetOptionalText(data, "ArName", item.NameEn);
             item.Save();
@@ -2308,6 +2405,106 @@ namespace GrowSurv.common
                 return value;
 
             throw new InvalidOperationException(propertyName + " is invalid.");
+        }
+
+        private int GetOptionalInt(JObject data, string propertyName)
+        {
+            JToken token = data[propertyName];
+            if (token == null)
+                return 0;
+
+            int value;
+            return int.TryParse(Convert.ToString(token, CultureInfo.InvariantCulture), out value) ? value : 0;
+        }
+
+        private void SoftDeleteCountry(int optionId)
+        {
+            Country item = new Country();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteGovernrate(int optionId)
+        {
+            Governrate item = new Governrate();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteBranch(int optionId)
+        {
+            Branch item = new Branch();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteDepartment(int optionId)
+        {
+            Department item = new Department();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteDivision(int optionId)
+        {
+            Division item = new Division();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteArea(int optionId)
+        {
+            Area item = new Area();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteAgeGroup(int optionId)
+        {
+            AgeGroup item = new AgeGroup();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteLevel(int optionId)
+        {
+            Level item = new Level();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteJobTitle(int optionId)
+        {
+            JobTitle item = new JobTitle();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void SoftDeleteGrade(int optionId)
+        {
+            Grade item = new Grade();
+            item.LoadByPrimaryKey(optionId);
+            item.IsActive = false;
+            item.Save();
+        }
+
+        private void DeleteGender(int optionId)
+        {
+            Gender item = new Gender();
+            if (item.LoadByPrimaryKey(optionId))
+            {
+                item.MarkAsDeleted();
+                item.Save();
+            }
         }
         [WebMethod]
         public void getAllDemographicWeightsBySurveyID(int surveyId, int companyID)

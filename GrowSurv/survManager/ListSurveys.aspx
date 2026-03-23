@@ -53,7 +53,10 @@
                             <div class="col-md-6">
 
                                 <select class="bs-select form-control" data-live-search="true" id="filterCompany" data-size="8" ng-model="SelectedCompany">
-                                    <%if(User.IsInRole("admin")) {%> <option value="0">All</option><%} %>
+                                    <%if (User.IsInRole("admin"))
+                                    {%>
+                                    <option value="0">All</option>
+                                    <%} %>
                                     <option ng-repeat="item in Companies" ng-value="item.CompanyID">{{item.EnName}}</option>
                                 </select>
                             </div>
@@ -77,9 +80,9 @@
                                     <td>{{item.CompanyEnName}}</td>
                                     <td>{{item.ExpiryDate | date : 'dd/MM/yyyy' }}</td>
                                     <td>
-                                        <a href="javascript:;" class="btn blue" ng-click="EditSurvey(item.SurveyID)"><i class="fa fa-edit"></i> Edit </a>
-                                        <a href="javascript:;" class="btn red" ng-click="deleteSurvey(item.SurveyID)"><i class="fa fa-trash"></i> Delete </a>
-                                        <a href="javascript:;" ng-show="!item.IsPublic" class="btn green" ng-click="PublishSurvey(item.SurveyID)"><i class="fa fa-send"></i> Publish 
+                                        <a href="javascript:;" class="btn blue" ng-click="EditSurvey(item.SurveyID)"><i class="fa fa-edit"></i>Edit </a>
+                                        <a href="javascript:;" class="btn red" ng-click="deleteSurvey(item.SurveyID)"><i class="fa fa-trash"></i>Delete </a>
+                                        <a href="javascript:;" ng-show="!item.IsPublic" class="btn green" ng-click="PublishSurvey(item.SurveyID)"><i class="fa fa-send"></i>Publish 
                                              <i class="fa fa-spinner fa-spin" ng-show="PublishStatus.PublishingToAll && PublishStatus.SurveyID == item.SurveyID"></i>
                                         </a>
 
@@ -90,11 +93,11 @@
                                                 </a>
                                                 <ul class="dropdown-menu pull-right">
                                                     <li>
-                                                        <a href="javascript:;" ng-click="ViewReports(item.SurveyID)"><i class="fa fa-dashboard"></i> Reports </a>
+                                                        <a href="javascript:;" ng-click="ViewReports(item.SurveyID)"><i class="fa fa-dashboard"></i>Reports </a>
                                                     </li>
                                                     <li>
                                                         <a href="javascript:;" ng-click="DuplicateSurvey(item.SurveyID)">
-                                                            <i class="fa fa-copy"></i> Duplicate Survey </a>
+                                                            <i class="fa fa-copy"></i>Duplicate Survey </a>
                                                     </li>
                                                     <%--                                                <li>
                                                     <a href="javascript:;">
@@ -116,7 +119,7 @@
                         <div class="caption">
                             <span class="caption-subject uppercase">Add/Edit Survey</span>
                         </div>
-                        <div style="float:left;width:30%;text-align:right;padding:10px 0;font-size:18px;line-height:18px;">
+                        <div style="float: left; width: 30%; text-align: right; padding: 10px 0; font-size: 18px; line-height: 18px;">
                             Survey Name : 
                             {{Survey.EnName}}
                         </div>
@@ -140,7 +143,7 @@
                                     <li>
                                         <a href="#tab_Questions" ng-hide="!EditMode" data-toggle="tab">Questions </a>
                                     </li>
-                                    <li style="display:none;">
+                                    <li style="display: none;">
                                         <a href="#tab_skipLogic" ng-hide="!EditMode" data-toggle="tab">skip logic rules </a>
                                     </li>
                                     <li>
@@ -172,19 +175,19 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group form-md-line-input form-md-floating-label has-info">
-                                                       <label>
-                                                        <input type="checkbox" ng-model="Survey.IsPublic">
-                                                        Public Survey 
-                                                    </label>
+                                                        <label>
+                                                            <input type="checkbox" ng-model="Survey.IsPublic">
+                                                            Public Survey 
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                             <div class="row" ng-show="Survey.IsPublic">            
-                                                 <div class="form-group form-md-line-input form-md-floating-label has-info">                                     
-                                                 <input type="text" class="form-control edited" readonly ng-model="Survey.PublicURL" id="form_control_public" />
-                                                 <label for="form_control_public">Public URL</label>
-                                                     </div>
-                                                 </div>
+                                            <div class="row" ng-show="Survey.IsPublic">
+                                                <div class="form-group form-md-line-input form-md-floating-label has-info">
+                                                    <input type="text" class="form-control edited" readonly ng-model="Survey.PublicURL" id="form_control_public" />
+                                                    <label for="form_control_public">Public URL</label>
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group form-md-line-input form-md-floating-label has-info">
@@ -244,11 +247,11 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group form-md-line-input form-md-floating-label has-info">
-                                                         <input type="text" ng-class="{'form-control edited' : Survey.EmailSubject != '', 'form-control' : Survey.EmailSubject == ''}" id="form_control_2" ng-model="Survey.EmailSubject" required>
+                                                        <input type="text" ng-class="{'form-control edited' : Survey.EmailSubject != '', 'form-control' : Survey.EmailSubject == ''}" id="form_control_2" ng-model="Survey.EmailSubject" required>
                                                         <label for="form_control_2">Email subject</label>
                                                     </div>
                                                 </div>
-                                                
+
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6">
@@ -297,10 +300,10 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-  													<label>
-                                                        <input type="checkbox" ng-model="Survey.SkipDemographicPage">
-                                                        Skip Demographic Page 
-                                                    </label>
+                                                <label>
+                                                    <input type="checkbox" ng-model="Survey.SkipDemographicPage">
+                                                    Skip Demographic Page 
+                                                </label>
                                                 <div class="col-md-12">
                                                     <h3>What are the mandatory fields to be filled ?
                                                     </h3>
@@ -450,21 +453,21 @@
                                                     <table class="table table-hover table-striped table-condensed table-bordered">
                                                         <thead>
                                                             <tr>
-                                                                <td style="width:40%">Title</td>
-                                                                <td style="width:20%">Type</td>
-                                                                <td style="width:10%">Order</td>
-                                                                <td style="width:15%">Actions</td>                                                           
+                                                                <td style="width: 40%">Title</td>
+                                                                <td style="width: 20%">Type</td>
+                                                                <td style="width: 10%">Order</td>
+                                                                <td style="width: 15%">Actions</td>
                                                             </tr>
                                                         </thead>
                                                         <tr ng-repeat="item in Questions">
                                                             <td>{{item.EnTitle}}</td>
                                                             <td>{{item.QuestionTypeName}}</td>
-                                                             <td>
+                                                            <td>
                                                                 <div class="form-group form-md-line-input form-md-floating-label has-info">
                                                                     <input type="text" class="form-control edited" ng-model="item.QuestionOrder" />
                                                                 </div>
-                                                               </td>
-                                                            <td style="min-width:250px">
+                                                            </td>
+                                                            <td style="min-width: 250px">
                                                                 <a href="javascript:;" class="btn btn-xs blue" ng-click="editQuestion(item)"><i class="fa fa-edit"></i>Edit </a>
                                                                 <a href="javascript:;" class="btn btn-xs blue-ebonyclay" ng-click="duplicateQuestion(item)"><i class="fa fa-copy"></i>Duplicate </a>
                                                                 <a href="javascript:;" class="btn btn-xs red" ng-click="deleteQuestion(item)"><i class="fa fa-trash"></i>Delete </a>
@@ -678,7 +681,7 @@
                                                             </h3>
                                                             <hr />
                                                             <div class="col-md-12" style="padding-bottom: 15px">
-                                                                <div class="col-md-4" style="padding:0">
+                                                                <div class="col-md-4" style="padding: 0">
                                                                     <input type="text" class="form-control" placeholder="Search surveys" ng-model="filterTxt" ng-keydown="$event.keyCode === 13 && getAllSurveys()" />
                                                                 </div>
                                                                 <div class="col-md-4">
@@ -726,7 +729,7 @@
                                                                             <td>Check</td>
                                                                             <td>Title</td>
                                                                             <td>Type</td>
-<%--                                                                            <td>Actions</td>--%>
+                                                                            <%--                                                                            <td>Actions</td>--%>
                                                                         </tr>
                                                                     </thead>
                                                                     <tr ng-repeat="item in QuestionsToImport">
@@ -737,13 +740,13 @@
                                                                         </td>
                                                                         <td>{{item.EnTitle}}</td>
                                                                         <td>{{item.QuestionTypeName}}</td>
-<%--                                                                        <td>
+                                                                        <%--                                                                        <td>
                                                                             <a href="javascript:;" class="btn btn-xs blue" ng-click="importQuestion(item)"><i class="fa fa-copy"></i>Import Question </a>
                                                                         </td>--%>
                                                                     </tr>
                                                                 </table>
                                                                 <div class="col-md-12 text-center">
-                                                                    <a href="javascript:;" class="btn blue" ng-click="importQuestionBulk()"><i class="fa fa-copy"></i> Import Selected Questions </a>
+                                                                    <a href="javascript:;" class="btn blue" ng-click="importQuestionBulk()"><i class="fa fa-copy"></i>Import Selected Questions </a>
                                                                 </div>
                                                             </div>
 
@@ -766,7 +769,7 @@
                                                                             <td>Check</td>
                                                                             <td>Title</td>
                                                                             <td>Type</td>
-<%--                                                                            <td>Actions</td>--%>
+                                                                            <%--                                                                            <td>Actions</td>--%>
                                                                         </tr>
                                                                     </thead>
                                                                     <tr ng-repeat="item in BankQuestionsToImport">
@@ -777,13 +780,13 @@
                                                                         </td>
                                                                         <td>{{item.EnTitle}}</td>
                                                                         <td>{{item.QuestionTypeName}}</td>
-<%--                                                                        <td>
+                                                                        <%--                                                                        <td>
                                                                             <a href="javascript:;" class="btn btn-xs blue" ng-click="importQuestion(item)"><i class="fa fa-copy"></i>Import Question </a>
                                                                         </td>--%>
                                                                     </tr>
                                                                 </table>
                                                                 <div class="col-md-12 text-center">
-                                                                    <a href="javascript:;" class="btn blue" ng-click="importBankQuestionBulk()"><i class="fa fa-copy"></i> Import Selected Questions </a>
+                                                                    <a href="javascript:;" class="btn blue" ng-click="importBankQuestionBulk()"><i class="fa fa-copy"></i>Import Selected Questions </a>
                                                                 </div>
                                                             </div>
 
@@ -918,7 +921,7 @@
                                         <h3 class="font-dark">Publish List</h3>
                                         <hr />
                                         <div class="col-md-12 form-group form-md-line-input has-info" ng-hide="Survey.IsPublic">
-                                            <div class="input-group input-group-sm" >
+                                            <div class="input-group input-group-sm">
                                                 <div class="input-group-control">
                                                     <input type="text" ng-class="{'form-control edited' : Mail.MemberEmail != '', 'form-control' : Mail.MemberEmail == ''}" ng-model="Mail.MemberEmail">
                                                     <label for="form_control_2">Mail</label>
@@ -944,10 +947,10 @@
                                                     <a ng-hide="Survey.IsPublic" href="javascript:;" ng-click="DeleteEMail(PMail.MemberID)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete </a>
                                                     <a ng-hide="Survey.IsPublic" href="javascript:;" ng-click="SendEMail(PMail.MemberID, PMail.SurveyID)" class="btn btn-xs green"><i class="fa fa-send"></i>Publish Survey 
                                                         <i class="fa fa-spinner fa-spin" ng-show="PublishStatus.PublishingToMember && PublishStatus.MemberID == PMail.MemberID"></i>
-                                                    </a>                                        
+                                                    </a>
                                                     <%if (User.IsInRole("admin"))
-                                                        {%>                                                               
-                                                     <a href="doreport.aspx?r=6&sid={{PMail.SurveyID}}&g=GovEnName&gd=&lang=en&mid={{PMail.MemberID}}" target="_blank" class="btn btn-xs green"><i class="fa fa-file"></i>Survey Answers                                                       
+                                                        {%>
+                                                    <a href="doreport.aspx?r=6&sid={{PMail.SurveyID}}&g=GovEnName&gd=&lang=en&mid={{PMail.MemberID}}" target="_blank" class="btn btn-xs green"><i class="fa fa-file"></i>Survey Answers                                                       
                                                     </a>
                                                     <%} %>
                                                 </td>
@@ -964,44 +967,45 @@
                                             <li>
                                                 <a href="#tab_Gov" data-toggle="tab">State</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Branch" data-toggle="tab">Branch</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Department" data-toggle="tab">Department</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Div" data-toggle="tab">Division</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Area" data-toggle="tab">Area</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Age" data-toggle="tab">Age</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Level" data-toggle="tab">Level</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Jt" data-toggle="tab">Job title</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Grade" data-toggle="tab">Grade</a>
                                             </li>
-                                            <li >
+                                            <li>
                                                 <a href="#tab_Gender" data-toggle="tab">Gender</a>
                                             </li>
                                         </ul>
                                         <div class="tab-content">
-                                                                                        <div class="tab-pane active" id="tab_Con">
+                                            <div class="tab-pane active" id="tab_Con">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('country')"><i class="fa fa-plus"></i> Add country</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('country')"><i class="fa fa-plus"></i>Add country</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Country</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="con in ConList">
@@ -1011,18 +1015,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="con.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('country', con)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('country', con)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Gov">
+                                            <div class="tab-pane" id="tab_Gov">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('state')"><i class="fa fa-plus"></i> Add state</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('state')"><i class="fa fa-plus"></i>Add state</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Governrate</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="gov in GovList">
@@ -1032,18 +1041,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="gov.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('state', gov)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('state', gov)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Branch">
+                                            <div class="tab-pane" id="tab_Branch">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('branch')"><i class="fa fa-plus"></i> Add branch</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('branch')"><i class="fa fa-plus"></i>Add branch</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Branch</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="branch in BranchList">
@@ -1053,18 +1067,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="branch.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('branch', branch)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('branch', branch)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Department">
+                                            <div class="tab-pane" id="tab_Department">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('department')"><i class="fa fa-plus"></i> Add department</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('department')"><i class="fa fa-plus"></i>Add department</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Department</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="dept in DeptList">
@@ -1074,18 +1093,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="dept.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('department', dept)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('department', dept)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Div">
+                                            <div class="tab-pane" id="tab_Div">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('division')"><i class="fa fa-plus"></i> Add division</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('division')"><i class="fa fa-plus"></i>Add division</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Division</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="div in DivList">
@@ -1095,18 +1119,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="div.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('division', div)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('division', div)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Area">
+                                            <div class="tab-pane" id="tab_Area">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('area')"><i class="fa fa-plus"></i> Add area</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('area')"><i class="fa fa-plus"></i>Add area</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Area</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="area in AreaList">
@@ -1116,18 +1145,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="area.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('area', area)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('area', area)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Age">
+                                            <div class="tab-pane" id="tab_Age">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('age')"><i class="fa fa-plus"></i> Add age group</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('age')"><i class="fa fa-plus"></i>Add age group</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Age group</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="age in AgeList">
@@ -1137,18 +1171,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="age.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('age', age)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('age', age)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Level">
+                                            <div class="tab-pane" id="tab_Level">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('level')"><i class="fa fa-plus"></i> Add level</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('level')"><i class="fa fa-plus"></i>Add level</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Level</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="level in LevelList">
@@ -1158,18 +1197,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="level.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('level', level)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('level', level)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Jt">
+                                            <div class="tab-pane" id="tab_Jt">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('jobtitle')"><i class="fa fa-plus"></i> Add job title</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('jobtitle')"><i class="fa fa-plus"></i>Add job title</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Job title</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="jt in JobTitleList">
@@ -1179,18 +1223,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="jt.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('jobtitle', jt)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('jobtitle', jt)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Grade">
+                                            <div class="tab-pane" id="tab_Grade">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('grade')"><i class="fa fa-plus"></i> Add grade</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('grade')"><i class="fa fa-plus"></i>Add grade</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Grade</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="grade in GradeList">
@@ -1200,18 +1249,23 @@
                                                                 <input type="text" class="form-control edited" ng-model="grade.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('grade', grade)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('grade', grade)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
-                                                                                        <div class="tab-pane" id="tab_Gender">
+                                            <div class="tab-pane" id="tab_Gender">
                                                 <div class="clearfix" style="margin-bottom: 15px;">
-                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('gender')"><i class="fa fa-plus"></i> Add gender</button>
+                                                    <button type="button" class="btn blue btn-sm pull-right" ng-click="AddDemographicOption('gender')"><i class="fa fa-plus"></i>Add gender</button>
                                                 </div>
                                                 <table class="table table-hover table-striped table-condensed table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <td>Gender</td>
                                                             <td>Weight</td>
+                                                            <td>Actions</td>
                                                         </tr>
                                                     </thead>
                                                     <tr ng-repeat="gender in GenderList">
@@ -1221,6 +1275,10 @@
                                                                 <input type="text" class="form-control edited" ng-model="gender.Weight" />
                                                             </div>
                                                         </td>
+                                                        <td>
+                                                            <a href="javascript:;" ng-click="EditDemographicOption('gender', gender)" class="btn btn-xs blue"><i class="fa fa-edit"></i>Edit</a>
+                                                            <a href="javascript:;" ng-click="DeleteDemographicOption('gender', gender)" class="btn btn-xs red"><i class="fa fa-trash"></i>Delete</a>
+                                                        </td>
                                                     </tr>
                                                 </table>
                                             </div>
@@ -1228,7 +1286,7 @@
                                                 <button type="button" class="btn green" ng-click="SaveDemographic()">Save changes</button>
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>

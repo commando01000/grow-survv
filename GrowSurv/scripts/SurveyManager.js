@@ -967,6 +967,45 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         return '<select id="demographicCountryId" class="swal2-select">' + options.join("") + '</select>';
     }
 
+    function getDemographicOptionId(type, item) {
+        if (!item) {
+            return 0;
+        }
+
+        switch (type) {
+            case "country": return item.CountryID;
+            case "state": return item.GovernrateID;
+            case "branch": return item.BranchID;
+            case "department": return item.DepartmentID;
+            case "division": return item.DivisionID;
+            case "area": return item.AreaID;
+            case "age": return item.AgeGroupID;
+            case "level": return item.LevelID;
+            case "jobtitle": return item.JobTitleID;
+            case "grade": return item.GradeID;
+            case "gender": return item.GenderID;
+            default: return 0;
+        }
+    }
+
+    function applyDialogDefaults(type, item) {
+        if (!item) {
+            return;
+        }
+
+        $("#demographicEnName").val(item.EnName || item.NameEn || item.EnDisplayName || "");
+        $("#demographicArName").val(item.ArName || item.NameAr || item.ArDisplayName || "");
+
+        if (type === "state") {
+            $("#demographicCountryId").val(String(item.CountryID || ""));
+        }
+
+        if (type === "age") {
+            $("#demographicStartAge").val(item.StartAge);
+            $("#demographicEndAge").val(item.EndAge);
+        }
+    }
+
     function getDemographicList(type) {
         switch (type) {
             case "country":
@@ -1047,12 +1086,12 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         return false;
     }
 
-    function buildDemographicDialog(type) {
+    function buildDemographicDialog(type, item) {
+        var isEdit = !!item;
         var config = {
-            title: "Add demographic option",
+            title: (isEdit ? "Edit" : "Add") + " demographic option",
             html: buildInput("demographicEnName", "English name") +
-                buildInput("demographicArName", "Arabic name (optional)") +
-                buildWeightInput(),
+                buildInput("demographicArName", "Arabic name (optional)"),
             validate: function () {
                 var enName = getDemographicInputValue("demographicEnName");
                 if (!enName) {
@@ -1061,25 +1100,25 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
 
                 return {
                     EnName: enName,
-                    ArName: getDemographicInputValue("demographicArName"),
-                    Weight: getOptionalWeightValue()
+                    ArName: getDemographicInputValue("demographicArName")
                 };
+            },
+            onOpen: function () {
+                applyDialogDefaults(type, item);
             }
         };
 
         switch (type) {
             case "country":
-                config.title = "Add country";
+                config.title = (isEdit ? "Edit country" : "Add country");
                 config.html = buildInput("demographicEnName", "Country name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "state":
-                config.title = "Add state";
+                config.title = (isEdit ? "Edit state" : "Add state");
                 config.html = buildCountrySelect() +
                     buildInput("demographicEnName", "State name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 config.validate = function () {
                     var countryId = getDemographicInputValue("demographicCountryId");
                     var enName = getDemographicInputValue("demographicEnName");
@@ -1095,42 +1134,39 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                     return {
                         CountryID: parseInt(countryId, 10),
                         EnName: enName,
-                        ArName: getDemographicInputValue("demographicArName"),
-                        Weight: getOptionalWeightValue()
+                        ArName: getDemographicInputValue("demographicArName")
                     };
+                };
+                config.onOpen = function () {
+                    applyDialogDefaults(type, item);
                 };
                 break;
             case "branch":
-                config.title = "Add branch";
+                config.title = (isEdit ? "Edit branch" : "Add branch");
                 config.html = buildInput("demographicEnName", "Branch name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "department":
-                config.title = "Add department";
+                config.title = (isEdit ? "Edit department" : "Add department");
                 config.html = buildInput("demographicEnName", "Department name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "division":
-                config.title = "Add division";
+                config.title = (isEdit ? "Edit division" : "Add division");
                 config.html = buildInput("demographicEnName", "Division name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "area":
-                config.title = "Add area";
+                config.title = (isEdit ? "Edit area" : "Add area");
                 config.html = buildInput("demographicEnName", "Area name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "age":
-                config.title = "Add age group";
+                config.title = (isEdit ? "Edit age group" : "Add age group");
                 config.html = buildInput("demographicStartAge", "Start age", "number") +
                     buildInput("demographicEndAge", "End age", "number") +
                     buildInput("demographicEnName", "Display name (optional)") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 config.validate = function () {
                     var startAge = getDemographicInputValue("demographicStartAge");
                     var endAge = getDemographicInputValue("demographicEndAge");
@@ -1153,34 +1189,32 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                         StartAge: parsedStart,
                         EndAge: parsedEnd,
                         EnName: getDemographicInputValue("demographicEnName"),
-                        ArName: getDemographicInputValue("demographicArName"),
-                        Weight: getOptionalWeightValue()
+                        ArName: getDemographicInputValue("demographicArName")
                     };
+                };
+                config.onOpen = function () {
+                    applyDialogDefaults(type, item);
                 };
                 break;
             case "level":
-                config.title = "Add level";
+                config.title = (isEdit ? "Edit level" : "Add level");
                 config.html = buildInput("demographicEnName", "Level name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "jobtitle":
-                config.title = "Add job title";
+                config.title = (isEdit ? "Edit job title" : "Add job title");
                 config.html = buildInput("demographicEnName", "Job title") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "grade":
-                config.title = "Add grade";
+                config.title = (isEdit ? "Edit grade" : "Add grade");
                 config.html = buildInput("demographicEnName", "Grade name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
             case "gender":
-                config.title = "Add gender";
+                config.title = (isEdit ? "Edit gender" : "Add gender");
                 config.html = buildInput("demographicEnName", "Gender name") +
-                    buildInput("demographicArName", "Arabic name (optional)") +
-                    buildWeightInput();
+                    buildInput("demographicArName", "Arabic name (optional)");
                 break;
         }
 
@@ -1209,6 +1243,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
             cancelButtonText: "Cancel",
             confirmButtonColor: "#3598DC",
             cancelButtonColor: "#BFBFBF",
+            onOpen: dialog.onOpen,
             preConfirm: function () {
                 return new Promise(function (resolve, reject) {
                     var model = dialog.validate();
@@ -1248,6 +1283,95 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
             });
         }, function () { });
     }
+
+    $scope.EditDemographicOption = function (type, item) {
+        var dialog = buildDemographicDialog(type, item);
+        swal({
+            title: dialog.title,
+            html: dialog.html,
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            confirmButtonText: "Save",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#3598DC",
+            cancelButtonColor: "#BFBFBF",
+            onOpen: dialog.onOpen,
+            preConfirm: function () {
+                return new Promise(function (resolve, reject) {
+                    var model = dialog.validate();
+                    if (typeof model === "string") {
+                        reject(model);
+                        return;
+                    }
+
+                    var optionId = getDemographicOptionId(type, item);
+                    if (optionId) {
+                        switch (type) {
+                            case "country": model.CountryID = optionId; break;
+                            case "state": model.GovernrateID = optionId; break;
+                            case "branch": model.BranchID = optionId; break;
+                            case "department": model.DepartmentID = optionId; break;
+                            case "division": model.DivisionID = optionId; break;
+                            case "area": model.AreaID = optionId; break;
+                            case "age": model.AgeGroupID = optionId; break;
+                            case "level": model.LevelID = optionId; break;
+                            case "jobtitle": model.JobTitleID = optionId; break;
+                            case "grade": model.GradeID = optionId; break;
+                            case "gender": model.GenderID = optionId; break;
+                        }
+                    }
+
+                    resolve(model);
+                });
+            }
+        }).then(function (model) {
+            if (!model) {
+                return;
+            }
+
+            $http.post("/common/common.asmx/SaveDemographicOption", {
+                type: type,
+                companyID: $scope.Survey.CompanyID,
+                model: model
+            }).then(function (result) {
+                if (result.data == true) {
+                    $scope.getAllDemographicWeights();
+                    $rootScope.$emit("swAlertSave", {});
+                }
+                else {
+                    $rootScope.$emit("swAlertError", {});
+                }
+            }, function () {
+                $rootScope.$emit("swAlertError", {});
+            });
+        }, function () { });
+    };
+
+    $scope.DeleteDemographicOption = function (type, item) {
+        var optionId = getDemographicOptionId(type, item);
+        if (!optionId) {
+            return;
+        }
+
+        $rootScope.$emit("swConfirmDelete", {
+            function() {
+                $http.post("/common/common.asmx/DeleteDemographicOption", {
+                    type: type,
+                    optionId: optionId
+                }).then(function (result) {
+                    if (result.data == true) {
+                        $scope.getAllDemographicWeights();
+                        $rootScope.$emit("swAlertSave", {});
+                    }
+                    else {
+                        $rootScope.$emit("swAlertSorry", {});
+                    }
+                }, function () {
+                    $rootScope.$emit("swAlertError", {});
+                });
+            }
+        });
+    };
 
     /*Startup functions*/
     $scope.getAllSurveys();
