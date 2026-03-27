@@ -202,8 +202,13 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     }
     $scope.DuplicateSurvey = function (surveyID) {
         $http.post("/common/common.asmx/DuplicateSurvey", { SurveyID: surveyID }).then(function (Result) {
-            $rootScope.$emit("swAlertSave", {});
-            $scope.getAllSurveys();
+            if (Result.data === true) {
+                $rootScope.$emit("swAlertSave", {});
+                $scope.getAllSurveys();
+            }
+            else {
+                $rootScope.$emit("swAlertError", {});
+            }
         }, function () {
             $rootScope.$emit("swAlertError", {});
         });

@@ -277,171 +277,179 @@ namespace GrowSurv.common
         [WebMethod]
         public void DuplicateSurvey(int SurveyID)
         {
-            // Duplicating Survey :: NewSurvey
-            #region Duplicating Survey
-
-            Survey OldSurvey = new Survey();
-            OldSurvey.LoadByPrimaryKey(SurveyID);
-
-            Survey NewSurvey = new Survey();
-            NewSurvey.AddNew();
-
-            NewSurvey.ArName = OldSurvey.ArName + " (مكرر)";
-            NewSurvey.EnName = OldSurvey.EnName + " (Duplicated)";
-            NewSurvey.ArDesc = OldSurvey.IsColumnNull("ArDesc") ? "" : OldSurvey.ArDesc;
-            NewSurvey.EnDesc = OldSurvey.IsColumnNull("EnDesc") ? "" : OldSurvey.EnDesc;
-            NewSurvey.CompanyID = OldSurvey.CompanyID;
-            NewSurvey.ExpiryDate = OldSurvey.ExpiryDate;
-            NewSurvey.IsDivisionMandatory = OldSurvey.IsColumnNull("IsDivisionMandatory") ? false : OldSurvey.IsDivisionMandatory;
-            NewSurvey.IsDepartmentMandatory = OldSurvey.IsColumnNull("IsDepartmentMandatory") ? false : OldSurvey.IsDepartmentMandatory;
-            NewSurvey.IsAreaMandatory = OldSurvey.IsColumnNull("IsAreaMandatory") ? false : OldSurvey.IsAreaMandatory;
-            NewSurvey.IsBranchMandatory = OldSurvey.IsColumnNull("IsBranchMandatory") ? false : OldSurvey.IsBranchMandatory;
-            NewSurvey.IsGradeMandatory = OldSurvey.IsColumnNull("IsGradeMandatory") ? false : OldSurvey.IsGradeMandatory;
-            NewSurvey.IsLevelMandatory = OldSurvey.IsColumnNull("IsLevelMandatory") ? false : OldSurvey.IsLevelMandatory;
-            NewSurvey.IsJobTitleMandatory = OldSurvey.IsColumnNull("IsJobTitleMandatory") ? false : OldSurvey.IsJobTitleMandatory;
-            NewSurvey.IsGenderMandatory = OldSurvey.IsColumnNull("IsGenderMandatory") ? false : OldSurvey.IsGenderMandatory;
-            NewSurvey.IsAgeMandatory = OldSurvey.IsColumnNull("IsAgeMandatory") ? false : OldSurvey.IsAgeMandatory;
-            NewSurvey.IsDurationMandatory = OldSurvey.IsColumnNull("IsDurationMandatory") ? false : OldSurvey.IsDurationMandatory;
-            NewSurvey.IsCountryMandatory = OldSurvey.IsColumnNull("IsCountryMandatory") ? false : OldSurvey.IsCountryMandatory;
-            NewSurvey.IsPublic = OldSurvey.IsColumnNull("IsPublic") ? false : OldSurvey.IsPublic;
-            NewSurvey.IsRecentPromotionDateMandatory = OldSurvey.IsColumnNull("IsRecentPromotionDateMandatory") ? false : OldSurvey.IsRecentPromotionDateMandatory;
-            NewSurvey.SurveyTypeID = OldSurvey.SurveyTypeID;
-            if (OldSurvey.IsColumnNull("Duration"))
-                NewSurvey.SetColumnNull("Duration");
-            else
-                NewSurvey.Duration = OldSurvey.Duration;
-            NewSurvey.IsGovernrateMandatory = OldSurvey.IsColumnNull("IsGovernrateMandatory") ? false : OldSurvey.IsGovernrateMandatory;
-            NewSurvey.ArHeader = OldSurvey.IsColumnNull("ArDesc") ? "" : OldSurvey.ArHeader;
-            NewSurvey.EnHeader = OldSurvey.IsColumnNull("ArDesc") ? "" : OldSurvey.EnHeader;
-            NewSurvey.ArFooter = OldSurvey.IsColumnNull("ArDesc") ? "" : OldSurvey.ArFooter;
-            NewSurvey.EnFooter = OldSurvey.IsColumnNull("ArDesc") ? "" : OldSurvey.EnFooter;
-
-            NewSurvey.Save();
-            #endregion
-
-            // Duplicating SurveyDepartment :: NewSurveyDepartment
-            #region Duplicating SurveyDepartment
-            SurveyDepartment OldSurveyDepartment = new SurveyDepartment();
-            OldSurveyDepartment.Where.SurveyID.Value = OldSurvey.SurveyID;
-            OldSurveyDepartment.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-            OldSurveyDepartment.Query.Load();
-
-            if (OldSurveyDepartment.RowCount > 0)
+            try
             {
-                OldSurveyDepartment.Rewind();
-                for (int i = 0; i < OldSurveyDepartment.RowCount; i++)
+                Survey OldSurvey = new Survey();
+                if (!OldSurvey.LoadByPrimaryKey(SurveyID))
                 {
-                    SurveyDepartment NewSurveyDepartment = new SurveyDepartment();
-                    NewSurveyDepartment.AddNew();
-
-                    NewSurveyDepartment.SurveyID = NewSurvey.SurveyID;
-                    NewSurveyDepartment.DepartmentID = OldSurveyDepartment.DepartmentID;
-                    NewSurveyDepartment.Weight = OldSurveyDepartment.IsColumnNull("Weight") ? 0 : OldSurveyDepartment.Weight;
-
-                    NewSurvey.Save();
-                    OldSurveyDepartment.MoveNext();
+                    SetContentResult(false);
+                    return;
                 }
-            }
-            #endregion
 
-            // Duplicating Questions :: NewQuestion
-            #region Duplicating Questions
-            Question OldQuestion = new Question();
-            OldQuestion.Where.SurveyID.Value = OldSurvey.SurveyID;
-            OldQuestion.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-            OldQuestion.Query.Load();
+                Survey NewSurvey = new Survey();
+                NewSurvey.AddNew();
 
-            if (OldQuestion.RowCount > 0)
-            {
-                OldQuestion.Rewind();
-                for (int i = 0; i < OldQuestion.RowCount; i++)
+                NewSurvey.ArName = (OldSurvey.IsColumnNull("ArName") ? string.Empty : OldSurvey.ArName) + " (مكرر)";
+                NewSurvey.EnName = (OldSurvey.IsColumnNull("EnName") ? string.Empty : OldSurvey.EnName) + " (Duplicated)";
+                NewSurvey.ArDesc = OldSurvey.IsColumnNull("ArDesc") ? string.Empty : OldSurvey.ArDesc;
+                NewSurvey.EnDesc = OldSurvey.IsColumnNull("EnDesc") ? string.Empty : OldSurvey.EnDesc;
+                NewSurvey.ArHeader = OldSurvey.IsColumnNull("ArHeader") ? string.Empty : OldSurvey.ArHeader;
+                NewSurvey.EnHeader = OldSurvey.IsColumnNull("EnHeader") ? string.Empty : OldSurvey.EnHeader;
+                NewSurvey.ArFooter = OldSurvey.IsColumnNull("ArFooter") ? string.Empty : OldSurvey.ArFooter;
+                NewSurvey.EnFooter = OldSurvey.IsColumnNull("EnFooter") ? string.Empty : OldSurvey.EnFooter;
+                NewSurvey.EmailSubject = OldSurvey.IsColumnNull("EmailSubject") ? string.Empty : OldSurvey.EmailSubject;
+                NewSurvey.EmailBody = OldSurvey.IsColumnNull("EmailBody") ? string.Empty : OldSurvey.EmailBody;
+                NewSurvey.ArEmailBody = OldSurvey.IsColumnNull("ArEmailBody") ? string.Empty : OldSurvey.ArEmailBody;
+
+                if (OldSurvey.IsColumnNull("CompanyID"))
+                    NewSurvey.SetColumnNull("CompanyID");
+                else
+                    NewSurvey.CompanyID = OldSurvey.CompanyID;
+
+                if (OldSurvey.IsColumnNull("ExpiryDate"))
+                    NewSurvey.SetColumnNull("ExpiryDate");
+                else
+                    NewSurvey.ExpiryDate = OldSurvey.ExpiryDate;
+
+                NewSurvey.IsDivisionMandatory = OldSurvey.IsColumnNull("IsDivisionMandatory") ? false : OldSurvey.IsDivisionMandatory;
+                NewSurvey.IsDepartmentMandatory = OldSurvey.IsColumnNull("IsDepartmentMandatory") ? false : OldSurvey.IsDepartmentMandatory;
+                NewSurvey.IsAreaMandatory = OldSurvey.IsColumnNull("IsAreaMandatory") ? false : OldSurvey.IsAreaMandatory;
+                NewSurvey.IsBranchMandatory = OldSurvey.IsColumnNull("IsBranchMandatory") ? false : OldSurvey.IsBranchMandatory;
+                NewSurvey.IsGradeMandatory = OldSurvey.IsColumnNull("IsGradeMandatory") ? false : OldSurvey.IsGradeMandatory;
+                NewSurvey.IsLevelMandatory = OldSurvey.IsColumnNull("IsLevelMandatory") ? false : OldSurvey.IsLevelMandatory;
+                NewSurvey.IsJobTitleMandatory = OldSurvey.IsColumnNull("IsJobTitleMandatory") ? false : OldSurvey.IsJobTitleMandatory;
+                NewSurvey.IsGenderMandatory = OldSurvey.IsColumnNull("IsGenderMandatory") ? false : OldSurvey.IsGenderMandatory;
+                NewSurvey.IsAgeMandatory = OldSurvey.IsColumnNull("IsAgeMandatory") ? false : OldSurvey.IsAgeMandatory;
+                NewSurvey.IsDurationMandatory = OldSurvey.IsColumnNull("IsDurationMandatory") ? false : OldSurvey.IsDurationMandatory;
+                NewSurvey.IsCountryMandatory = OldSurvey.IsColumnNull("IsCountryMandatory") ? false : OldSurvey.IsCountryMandatory;
+                NewSurvey.IsPublic = OldSurvey.IsColumnNull("IsPublic") ? false : OldSurvey.IsPublic;
+                NewSurvey.IsRecentPromotionDateMandatory = OldSurvey.IsColumnNull("IsRecentPromotionDateMandatory") ? false : OldSurvey.IsRecentPromotionDateMandatory;
+                NewSurvey.IsGovernrateMandatory = OldSurvey.IsColumnNull("IsGovernrateMandatory") ? false : OldSurvey.IsGovernrateMandatory;
+                NewSurvey.SkipDemographicPage = OldSurvey.IsColumnNull("SkipDemographicPage") ? false : OldSurvey.SkipDemographicPage;
+                NewSurvey.SurveyTypeID = OldSurvey.SurveyTypeID;
+
+                if (OldSurvey.IsColumnNull("Duration"))
+                    NewSurvey.SetColumnNull("Duration");
+                else
+                    NewSurvey.Duration = OldSurvey.Duration;
+
+                NewSurvey.Save();
+
+                SurveyDepartment OldSurveyDepartment = new SurveyDepartment();
+                OldSurveyDepartment.Where.SurveyID.Value = OldSurvey.SurveyID;
+                OldSurveyDepartment.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                OldSurveyDepartment.Query.Load();
+
+                if (OldSurveyDepartment.RowCount > 0)
                 {
-                    Question NewQuestion = new Question();
-                    NewQuestion.AddNew();
-
-                    NewQuestion.SurveyID = NewSurvey.SurveyID;
-                    NewQuestion.QuestionTypeID = OldQuestion.QuestionTypeID;
-                    NewQuestion.ArTitle = OldQuestion.IsColumnNull("ArTitle") ? "" : OldQuestion.ArTitle;
-                    NewQuestion.EnTitle = OldQuestion.IsColumnNull("EnTitle") ? "" : OldQuestion.EnTitle;
-                    //ParentQuestionID ! TODO: Issue with Parent Question Field
-                    NewQuestion.IsMandatory = OldQuestion.IsColumnNull("IsMandatory") ? false : OldQuestion.IsMandatory;
-                    NewQuestion.Weight = OldQuestion.IsColumnNull("Weight") ? 0 : OldQuestion.Weight;
-                    //QuestionCatergoryID !TODO: Issue with Question Category Field
-                    NewQuestion.QuestionOrder = OldQuestion.IsColumnNull("QuestionOrder") ? 0 : OldQuestion.QuestionOrder;
-                    //QuestionBranchID ! TODO: Issue with Question Branch Field
-                    NewQuestion.Save();
-
-
-                    // Duplicating Current Question Answers
-                    Answer OldAnswer = new Answer();
-                    OldAnswer.Where.QuestionID.Value = OldQuestion.QuestionID;
-                    OldAnswer.Where.QuestionID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-                    OldAnswer.Query.Load();
-                    OldQuestion.MoveNext();
-                    if (OldAnswer.RowCount > 0)
+                    OldSurveyDepartment.Rewind();
+                    for (int i = 0; i < OldSurveyDepartment.RowCount; i++)
                     {
-                        OldAnswer.Rewind();
-                        for (int j = 0; j < OldAnswer.RowCount; j++)
-                        {
-                            Answer NewAnswer = new Answer();
-                            NewAnswer.AddNew();
-                            NewAnswer.ArName = OldAnswer.IsColumnNull("ArName") ? "" : OldAnswer.ArName;
-                            NewAnswer.EnName = OldAnswer.IsColumnNull("EnName") ? "" : OldAnswer.EnName;
-                            NewAnswer.QuestionID = NewQuestion.QuestionID;
-                            NewAnswer.Weight = OldAnswer.IsColumnNull("Weight") ? 0 : OldAnswer.Weight;
-                            NewAnswer.Save();
-                            OldAnswer.MoveNext();
-                        }
+                        SurveyDepartment NewSurveyDepartment = new SurveyDepartment();
+                        NewSurveyDepartment.AddNew();
+
+                        NewSurveyDepartment.SurveyID = NewSurvey.SurveyID;
+                        NewSurveyDepartment.DepartmentID = OldSurveyDepartment.DepartmentID;
+                        NewSurveyDepartment.Weight = OldSurveyDepartment.IsColumnNull("Weight") ? 0 : OldSurveyDepartment.Weight;
+                        NewSurveyDepartment.Save();
+
+                        OldSurveyDepartment.MoveNext();
                     }
                 }
-            }
-            #endregion
 
-            // Duplicating Question Categories :: NewQuestionCategory
-            #region Duplicating Question Categories
-            QuestionCategory OldQuestionCategory = new QuestionCategory();
-            OldQuestionCategory.Where.SureveyID.Value = SurveyID;
-            OldQuestionCategory.Where.SureveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-            OldQuestionCategory.Query.Load();
+                Question OldQuestion = new Question();
+                OldQuestion.Where.SurveyID.Value = OldSurvey.SurveyID;
+                OldQuestion.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                OldQuestion.Query.Load();
 
-            if (OldQuestionCategory.RowCount > 0)
-            {
-                OldQuestionCategory.Rewind();
-                for (int i = 0; i < OldQuestionCategory.RowCount; i++)
+                if (OldQuestion.RowCount > 0)
                 {
-                    QuestionCategory NewQuestionCategory = new QuestionCategory();
-                    NewQuestionCategory.AddNew();
-                    NewQuestionCategory.ArName = OldQuestionCategory.IsColumnNull("ArName") ? "" : OldQuestionCategory.ArName;
-                    NewQuestionCategory.EnName = OldQuestionCategory.IsColumnNull("EnName") ? "" : OldQuestionCategory.EnName;
-                    NewQuestionCategory.SureveyID = NewSurvey.SurveyID;
-                    NewQuestionCategory.Save();
-                    OldQuestionCategory.MoveNext();
+                    OldQuestion.Rewind();
+                    for (int i = 0; i < OldQuestion.RowCount; i++)
+                    {
+                        Question NewQuestion = new Question();
+                        NewQuestion.AddNew();
+
+                        NewQuestion.SurveyID = NewSurvey.SurveyID;
+                        NewQuestion.QuestionTypeID = OldQuestion.QuestionTypeID;
+                        NewQuestion.ArTitle = OldQuestion.IsColumnNull("ArTitle") ? string.Empty : OldQuestion.ArTitle;
+                        NewQuestion.EnTitle = OldQuestion.IsColumnNull("EnTitle") ? string.Empty : OldQuestion.EnTitle;
+                        NewQuestion.IsMandatory = OldQuestion.IsColumnNull("IsMandatory") ? false : OldQuestion.IsMandatory;
+                        NewQuestion.Weight = OldQuestion.IsColumnNull("Weight") ? 0 : OldQuestion.Weight;
+                        NewQuestion.QuestionOrder = OldQuestion.IsColumnNull("QuestionOrder") ? 0 : OldQuestion.QuestionOrder;
+                        NewQuestion.Save();
+
+                        Answer OldAnswer = new Answer();
+                        OldAnswer.Where.QuestionID.Value = OldQuestion.QuestionID;
+                        OldAnswer.Where.QuestionID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                        OldAnswer.Query.Load();
+
+                        if (OldAnswer.RowCount > 0)
+                        {
+                            OldAnswer.Rewind();
+                            for (int j = 0; j < OldAnswer.RowCount; j++)
+                            {
+                                Answer NewAnswer = new Answer();
+                                NewAnswer.AddNew();
+                                NewAnswer.ArName = OldAnswer.IsColumnNull("ArName") ? string.Empty : OldAnswer.ArName;
+                                NewAnswer.EnName = OldAnswer.IsColumnNull("EnName") ? string.Empty : OldAnswer.EnName;
+                                NewAnswer.QuestionID = NewQuestion.QuestionID;
+                                NewAnswer.Weight = OldAnswer.IsColumnNull("Weight") ? 0 : OldAnswer.Weight;
+                                NewAnswer.Save();
+                                OldAnswer.MoveNext();
+                            }
+                        }
+
+                        OldQuestion.MoveNext();
+                    }
                 }
-            }
-            #endregion
 
-            // Duplicating Question Branches :: NewQuestionBranch
-            #region Duplicating Question Branches
-            QuestionBranch OldQuestionBranch = new QuestionBranch();
-            OldQuestionBranch.Where.SurveyID.Value = SurveyID;
-            OldQuestionBranch.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-            OldQuestionBranch.Query.Load();
+                QuestionCategory OldQuestionCategory = new QuestionCategory();
+                OldQuestionCategory.Where.SureveyID.Value = SurveyID;
+                OldQuestionCategory.Where.SureveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                OldQuestionCategory.Query.Load();
 
-            if (OldQuestionBranch.RowCount > 0)
-            {
-                OldQuestionBranch.Rewind();
-                for (int i = 0; i < OldQuestionBranch.RowCount; i++)
+                if (OldQuestionCategory.RowCount > 0)
                 {
-                    QuestionBranch NewQuestionBranch = new QuestionBranch();
-                    NewQuestionBranch.AddNew();
-                    NewQuestionBranch.ArName = OldQuestionCategory.IsColumnNull("ArName") ? "" : OldQuestionCategory.ArName;
-                    NewQuestionBranch.EnName = OldQuestionCategory.IsColumnNull("EnName") ? "" : OldQuestionCategory.EnName;
-                    NewQuestionBranch.SurveyID = NewSurvey.SurveyID;
-                    NewQuestionBranch.Save();
-                    OldQuestionBranch.MoveNext();
+                    OldQuestionCategory.Rewind();
+                    for (int i = 0; i < OldQuestionCategory.RowCount; i++)
+                    {
+                        QuestionCategory NewQuestionCategory = new QuestionCategory();
+                        NewQuestionCategory.AddNew();
+                        NewQuestionCategory.ArName = OldQuestionCategory.IsColumnNull("ArName") ? string.Empty : OldQuestionCategory.ArName;
+                        NewQuestionCategory.EnName = OldQuestionCategory.IsColumnNull("EnName") ? string.Empty : OldQuestionCategory.EnName;
+                        NewQuestionCategory.SureveyID = NewSurvey.SurveyID;
+                        NewQuestionCategory.Save();
+                        OldQuestionCategory.MoveNext();
+                    }
                 }
+
+                QuestionBranch OldQuestionBranch = new QuestionBranch();
+                OldQuestionBranch.Where.SurveyID.Value = SurveyID;
+                OldQuestionBranch.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                OldQuestionBranch.Query.Load();
+
+                if (OldQuestionBranch.RowCount > 0)
+                {
+                    OldQuestionBranch.Rewind();
+                    for (int i = 0; i < OldQuestionBranch.RowCount; i++)
+                    {
+                        QuestionBranch NewQuestionBranch = new QuestionBranch();
+                        NewQuestionBranch.AddNew();
+                        NewQuestionBranch.ArName = OldQuestionBranch.IsColumnNull("ArName") ? string.Empty : OldQuestionBranch.ArName;
+                        NewQuestionBranch.EnName = OldQuestionBranch.IsColumnNull("EnName") ? string.Empty : OldQuestionBranch.EnName;
+                        NewQuestionBranch.SurveyID = NewSurvey.SurveyID;
+                        NewQuestionBranch.Save();
+                        OldQuestionBranch.MoveNext();
+                    }
+                }
+
+                SetContentResult(true);
             }
-            #endregion
+            catch
+            {
+                SetContentResult(false);
+            }
         }
 
         [WebMethod]
@@ -1922,7 +1930,7 @@ namespace GrowSurv.common
         {
             var baseUri = new Uri(GetSurveyBaseUrl(), UriKind.Absolute);
             var builder = new UriBuilder(baseUri);
-            
+
             // HttpUtility.ParseQueryString returns a special NameValueCollection (HttpValueCollection)
             // that handles URL encoding automatically when .ToString() is called.
             NameValueCollection query = HttpUtility.ParseQueryString(builder.Query);
@@ -1945,12 +1953,12 @@ namespace GrowSurv.common
             if (request != null && request.Url != null)
             {
                 // Many shared hosts/load balancers use X-Forwarded-Proto
-                string scheme = request.Headers["X-Forwarded-Proto"] ?? 
+                string scheme = request.Headers["X-Forwarded-Proto"] ??
                                (request.IsSecureConnection ? Uri.UriSchemeHttps : request.Url.Scheme);
-                
-                return string.Format("{0}://{1}{2}", 
-                    scheme, 
-                    request.Url.Authority, 
+
+                return string.Format("{0}://{1}{2}",
+                    scheme,
+                    request.Url.Authority,
                     VirtualPathUtility.ToAbsolute("~/doSurvey/index.aspx"));
             }
 
@@ -2050,7 +2058,7 @@ namespace GrowSurv.common
         {
             // Support TLS 1.0, 1.1, and 1.2
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            
+
             // Override certificate validation to allow self-signed certificates (common on shared mail servers)
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
