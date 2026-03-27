@@ -2,6 +2,7 @@
 using Microsoft.Reporting.WebForms;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -69,7 +70,7 @@ namespace GrowSurv.survManager
 
                             ReportDataSource rds9 = new ReportDataSource();
                             rds9.Name = "LevelDataSet";
-                            GSDataSetTableAdapters.GetEngagementRateBySurveyIDForAreaTableAdapter Levelds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForAreaTableAdapter();
+                            GSDataSetTableAdapters.GetEngagementRateBySurveyIDForLevelTableAdapter Levelds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForLevelTableAdapter();
                             Levelds.ClearBeforeFill = true;
 
                             ReportDataSource rds10 = new ReportDataSource();
@@ -97,7 +98,7 @@ namespace GrowSurv.survManager
                                 rds9.Value = Levelds.GetData(surveyID_1);
                                 rds10.Value = Jtds.GetData(surveyID_1);
                                 rds11.Value = Membersds.GetData(surveyID_1);
-                                ReportViewer1.LocalReport.ReportPath = "Reports\\"+lang+"SurveyEngagment.rdlc";
+                                ReportViewer1.LocalReport.ReportPath = "Reports\\" + lang + "SurveyEngagment.rdlc";
                                 ReportViewer1.LocalReport.DataSources.Clear();
                                 ReportViewer1.LocalReport.DataSources.Add(rds);
                                 ReportViewer1.LocalReport.DataSources.Add(rds2);
@@ -116,7 +117,7 @@ namespace GrowSurv.survManager
                             }
                             else
                                 return;
-                            
+
                             break;
                         case "2":
                         case "7":
@@ -128,9 +129,9 @@ namespace GrowSurv.survManager
                                 rds.Value = gsbysurveyID.GetData(surveyID);
                             else
                                 return;
-                            if(Request.QueryString["r"].ToString() == "2")
+                            if (Request.QueryString["r"].ToString() == "2")
                                 ReportViewer1.LocalReport.ReportPath = "Reports\\" + lang + "statisticsreport.rdlc";
-                            else if(Request.QueryString["r"].ToString() == "7")                            
+                            else if (Request.QueryString["r"].ToString() == "7")
                                 ReportViewer1.LocalReport.ReportPath = "Reports\\" + lang + "statisticsreport_pie.rdlc";
                             ReportViewer1.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(LocalReport_SubreportProcessing_Statistics);
                             break;
@@ -146,12 +147,12 @@ namespace GrowSurv.survManager
                             ReportViewer1.LocalReport.ReportPath = "Reports\\" + lang + "StatisticsReportWithGrouping.rdlc";
                             ReportParameter[] rep_params = new ReportParameter[2];
                             rep_params[0] = new ReportParameter("GroupBy", Request.QueryString["g"].ToString());
-                            rep_params[1] = new ReportParameter("GroupByDisplayName", Request.QueryString["gd"].ToString());                            
+                            rep_params[1] = new ReportParameter("GroupByDisplayName", Request.QueryString["gd"].ToString());
                             ReportViewer1.LocalReport.SetParameters(rep_params);
 
                             break;
                         case "4":
-                            Survey S = new Survey();                         
+                            Survey S = new Survey();
                             int surveyIDEval = 0;
                             if (!int.TryParse(Request.QueryString["sid"].ToString(), out surveyIDEval))
                                 return;
@@ -198,15 +199,15 @@ namespace GrowSurv.survManager
                             rds.Name = "DemoDataSet";
                             rds.Value = S.DefaultView;
                             ReportParameter[] rep_paramsEval = new ReportParameter[1];
-                            rep_paramsEval[0] = new ReportParameter("Demographic", Request.QueryString["gd"].ToString());                            
+                            rep_paramsEval[0] = new ReportParameter("Demographic", Request.QueryString["gd"].ToString());
                             ReportViewer1.LocalReport.SetParameters(rep_paramsEval);
-                            
+
                             break;
                         case "5":
                             ReportViewer1.LocalReport.ReportPath = "Reports\\" + lang + "Survey.rdlc";
                             ReportViewer1.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(LocalReport_SubreportProcessing);
                             rds.Name = "SurveyDataSet";
-                            GSDataSetTableAdapters.GetAllQuestionsAndAnswersBySurveyIDTableAdapter getall= new GSDataSetTableAdapters.GetAllQuestionsAndAnswersBySurveyIDTableAdapter();
+                            GSDataSetTableAdapters.GetAllQuestionsAndAnswersBySurveyIDTableAdapter getall = new GSDataSetTableAdapters.GetAllQuestionsAndAnswersBySurveyIDTableAdapter();
                             GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter getsub = new GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter();
                             getall.ClearBeforeFill = true;
                             int surveyIDGetAll = 0;
@@ -214,7 +215,7 @@ namespace GrowSurv.survManager
                             if (int.TryParse(Request.QueryString["sid"].ToString(), out surveyIDGetAll))
                             {
                                 rds.Value = getall.GetData(surveyIDGetAll);
-                                
+
                                 rds12.Name = "QuestionDataSet";
                                 rds12.Value = getsub.GetData(surveyIDGetAll);
                                 ReportViewer1.LocalReport.DataSources.Clear();
@@ -236,7 +237,7 @@ namespace GrowSurv.survManager
                             {
                                 int memberid = 0;
                                 int.TryParse(Request.QueryString["mid"].ToString(), out memberid);
-                                rds.Value = gsabysurveyID.GetData(surveyID_ans, memberid);
+                                rds.Value = BuildDetailedSurveyAnswersData(gsabysurveyID.GetData(surveyID_ans, memberid));
                                 ReportViewer1.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(LocalReport_SubreportProcessing_subQuestion);
                             }
                             else
@@ -251,7 +252,7 @@ namespace GrowSurv.survManager
                     ReportViewer1.LocalReport.Refresh();
                 }
 
-                
+
             }
         }
         private void LocalReport_SubreportProcessing_subQuestion(object sender, SubreportProcessingEventArgs e)
@@ -274,12 +275,55 @@ namespace GrowSurv.survManager
 
         private void LocalReport_SubreportProcessing(object sender, SubreportProcessingEventArgs e)
         {
-            GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter getsub = new GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter();            
+            GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter getsub = new GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter();
             ReportDataSource rds12 = new ReportDataSource();
             rds12.Name = "QuestionDataSet";
             rds12.Value = getsub.GetData(int.Parse(Request.QueryString["sid"].ToString()));
             e.DataSources.Add(rds12);
 
+        }
+
+        private static DataTable BuildDetailedSurveyAnswersData(GSDataSet.GetSurveyAnswerDetailsBySurveyIDAndMemberIDDataTable source)
+        {
+            DataTable data = source.Copy();
+
+            if (!data.Columns.Contains("HiringDateDisplay"))
+                data.Columns.Add("HiringDateDisplay", typeof(string));
+
+            if (!data.Columns.Contains("RecentPromotionDateDisplay"))
+                data.Columns.Add("RecentPromotionDateDisplay", typeof(string));
+
+            Dictionary<int, Tuple<string, string>> memberDates = new Dictionary<int, Tuple<string, string>>();
+
+            foreach (DataRow row in data.Rows)
+            {
+                if (row.IsNull("SurveyMemberID"))
+                    continue;
+
+                int surveyMemberId = Convert.ToInt32(row["SurveyMemberID"]);
+                if (!memberDates.ContainsKey(surveyMemberId))
+                {
+                    SurveyMember member = new SurveyMember();
+                    string hiringDate = string.Empty;
+                    string recentPromotionDate = string.Empty;
+
+                    if (member.LoadByPrimaryKey(surveyMemberId))
+                    {
+                        if (!member.IsColumnNull(SurveyMember.ColumnNames.HiringDate))
+                            hiringDate = member.HiringDate.ToString("yyyy-MM-dd");
+
+                        if (!member.IsColumnNull(SurveyMember.ColumnNames.RecentPromotionDate))
+                            recentPromotionDate = member.RecentPromotionDate.ToString("yyyy-MM-dd");
+                    }
+
+                    memberDates[surveyMemberId] = Tuple.Create(hiringDate, recentPromotionDate);
+                }
+
+                row["HiringDateDisplay"] = memberDates[surveyMemberId].Item1;
+                row["RecentPromotionDateDisplay"] = memberDates[surveyMemberId].Item2;
+            }
+
+            return data;
         }
     }
 }

@@ -107,7 +107,7 @@ namespace GrowSurv.doSurvey
                         mem.Save();
                         member = mem.MemberEmail;
                     }
-                    //BindSurveyInfo(surveyID);
+                    BindSurveyInfo(SurveyID);
 
                 }
                 catch (Exception x)

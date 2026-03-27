@@ -3323,7 +3323,7 @@
                     <Style>
                       <Format>0.00%</Format>
                     </Style>
-                    <Label>=Fields!AllMembers.Value / Sum(Fields!AllMembers.Value, "GovDataSet")</Label>
+                    <Label>=Fields!AllMembers.Value / Sum(Fields!AllMembers.Value, "ConDataSet")</Label>
                     <Visible>true</Visible>
                   </ChartDataLabel>
                   <Style />

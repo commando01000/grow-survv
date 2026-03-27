@@ -521,7 +521,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Round(Fields!AnsPercentage.Value,2)</Value>
+                              <Value>=IIF(Sum(Fields!AnswersCount.Value, "Group1") = 0, 0, Round((Fields!AnswersCount.Value * 100.0) / Sum(Fields!AnswersCount.Value, "Group1"), 2))</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>

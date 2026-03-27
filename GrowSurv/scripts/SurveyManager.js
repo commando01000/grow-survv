@@ -130,7 +130,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         $scope.QuestionCategory = {};
         $scope.QuestionAnswer = {};
         $scope.QuestionAnswers = [];
-        $scope.PublishList = [];        
+        $scope.PublishList = [];
         $scope.QuestionBranches = [];
         $scope.QuestionBranch = {};
         HideMasterShowDetails("#SurveyDetails", "#Listsurveys");
@@ -173,29 +173,29 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
 
 
         $rootScope.$emit("swConfirmPublish",
-           {
-               function() {
-                   $scope.PublishStatus.PublishingToAll = true;
-                   $scope.PublishStatus.SurveyID = SurveyID;
-                   $http.post("/common/common.asmx/PublishSurvey", { SurveyID: SurveyID }).then(function (Result) {
-                       if (Result.data == true) {
-                           $rootScope.$emit("swAlertPublish", {});
-                       }
-                       else
-                           $rootScope.$emit("swAlertError", {});
-                       $scope.PublishStatus.SurveyID = 0;
-                       $scope.PublishStatus.PublishingToAll = false;
+            {
+                function() {
+                    $scope.PublishStatus.PublishingToAll = true;
+                    $scope.PublishStatus.SurveyID = SurveyID;
+                    $http.post("/common/common.asmx/PublishSurvey", { SurveyID: SurveyID }).then(function (Result) {
+                        if (Result.data == true) {
+                            $rootScope.$emit("swAlertPublish", {});
+                        }
+                        else
+                            $rootScope.$emit("swAlertError", {});
+                        $scope.PublishStatus.SurveyID = 0;
+                        $scope.PublishStatus.PublishingToAll = false;
 
-                   }, function () {
-                       $scope.PublishStatus.SurveyID = 0;
-                       $scope.PublishStatus.PublishingToAll = false;
-                       $rootScope.$emit("swAlertError", {});
-                   });
-               }
-           });
+                    }, function () {
+                        $scope.PublishStatus.SurveyID = 0;
+                        $scope.PublishStatus.PublishingToAll = false;
+                        $rootScope.$emit("swAlertError", {});
+                    });
+                }
+            });
 
 
-        
+
     }
     $scope.ViewReports = function (SurveyID) {
         window.location.href = "/survManager/reports.aspx?sid=" + SurveyID;
@@ -323,10 +323,10 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
         });
 
     }
-    $scope.UpdateQuestionsOrders = function () {        
+    $scope.UpdateQuestionsOrders = function () {
         $http.post("/common/common.asmx/UpdateQuestionsOrders", { model: $scope.Questions }).then(function (Result) {
             if (hasHttpSuccess(Result)) {
-                $scope.getAllQuestions();                
+                $scope.getAllQuestions();
                 $rootScope.$emit("swAlertSave", {});
             }
             else
@@ -865,31 +865,31 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.SendEMail = function (memberID, surveyID) {
 
         $rootScope.$emit("swConfirmPublish",
-           {
-               function() {
-                   $scope.PublishStatus.PublishingToMember = true;
-                   $scope.PublishStatus.MemberID = memberID;
-                   $http.post("/common/common.asmx/SendEmailForAMember", { memberID: memberID, surveyID: surveyID }).then(function (Result) {
-                       // $scope.Mail = Result.data;
-                       //HideMasterShowDetails("#Listsurveys", "#SurveyDetails");
-                       $scope.PublishStatus.MemberID = 0;
-                       $scope.PublishStatus.PublishingToMember = false;
-                       if (Result.data == true) {
-                           $rootScope.$emit("swAlertPublish", {});
-                       }
-                       else {
-                           $rootScope.$emit("swAlertError", {});
-                       }
+            {
+                function() {
+                    $scope.PublishStatus.PublishingToMember = true;
+                    $scope.PublishStatus.MemberID = memberID;
+                    $http.post("/common/common.asmx/SendEmailForAMember", { memberID: memberID, surveyID: surveyID }).then(function (Result) {
+                        // $scope.Mail = Result.data;
+                        //HideMasterShowDetails("#Listsurveys", "#SurveyDetails");
+                        $scope.PublishStatus.MemberID = 0;
+                        $scope.PublishStatus.PublishingToMember = false;
+                        if (Result.data == true) {
+                            $rootScope.$emit("swAlertPublish", {});
+                        }
+                        else {
+                            $rootScope.$emit("swAlertError", {});
+                        }
 
-                   }, function () {
-                       $scope.PublishStatus.MemberID = 0;
-                       $scope.PublishStatus.PublishingToMember = false;
-                       $rootScope.$emit("swAlertError", {});
-                   });
-               }
-           });
+                    }, function () {
+                        $scope.PublishStatus.MemberID = 0;
+                        $scope.PublishStatus.PublishingToMember = false;
+                        $rootScope.$emit("swAlertError", {});
+                    });
+                }
+            });
 
-        
+
     };
 
     $scope.getAllDemographicWeights = function () {
