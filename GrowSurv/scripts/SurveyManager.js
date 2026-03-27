@@ -200,6 +200,25 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.ViewReports = function (SurveyID) {
         window.location.href = "/survManager/reports.aspx?sid=" + SurveyID;
     }
+    $scope.deleteSurvey = function (surveyID) {
+        $rootScope.$emit("swConfirmDelete", {
+            function() {
+                $http.post("/common/common.asmx/DeleteSurvey", { SurveyID: surveyID }).then(function (Result) {
+                    if (Result.data && Result.data.success === true) {
+                        $rootScope.$emit("swAlertSave", {});
+                        $scope.getAllSurveys();
+                    }
+                    else {
+                        if (Result.data && Result.data.message)
+                            alert(Result.data.message);
+                        $rootScope.$emit("swAlertError", {});
+                    }
+                }, function () {
+                    $rootScope.$emit("swAlertError", {});
+                });
+            }
+        });
+    }
     $scope.DuplicateSurvey = function (surveyID) {
         $http.post("/common/common.asmx/DuplicateSurvey", { SurveyID: surveyID }).then(function (Result) {
             if (Result.data === true) {

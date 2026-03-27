@@ -455,66 +455,157 @@ namespace GrowSurv.common
         [WebMethod]
         public void DeleteSurvey(int SurveyID)
         {
-            Survey survey = new Survey();
-            survey.LoadByPrimaryKey(SurveyID);
-
-            SurveyMember members = new SurveyMember();
-            members.GetListBySurveyID(SurveyID);
-
-            QuestionCategory cats = new QuestionCategory();
-            cats.GetSurveyCategoriesBySurveyID(SurveyID);
-
-            QuestionBranch branchs = new QuestionBranch();
-            branchs.GetBranchesBySurveyID(SurveyID);
-
-            Question question = new Question();
-            question.searchQuestions("", SurveyID);
-
-            for (int i = 0; i < question.RowCount; i++)
+            try
             {
-
-                SurveyMemberAnswer sma = new SurveyMemberAnswer();
-                sma.getSurveyMemberAnswerByQuestionID(question.QuestionID);
-                sma.DeleteAll();
-
-                if (question.QuestionTypeID == 5)
+                Survey survey = new Survey();
+                if (!survey.LoadByPrimaryKey(SurveyID))
                 {
-                    Question subs = new Question();
-                    subs.GetSubQuestionsByQuestionID(question.QuestionID);
-                    subs.DeleteAll();
-                    subs.Save();
+                    SetContentResult(new { success = false, message = "Survey not found." });
+                    return;
                 }
 
+                SurveyMember members = new SurveyMember();
+                members.GetListBySurveyID(SurveyID);
 
-                Answer answers = new Answer();
-                answers.getAnswersByQuestionID(question.QuestionID);
+                QuestionCategory cats = new QuestionCategory();
+                cats.GetSurveyCategoriesBySurveyID(SurveyID);
 
+                QuestionBranch branchs = new QuestionBranch();
+                branchs.GetBranchesBySurveyID(SurveyID);
 
-                answers.DeleteAll();
-                question.MarkAsDeleted();
-                try
+                Question question = new Question();
+                question.searchQuestions("", SurveyID);
+
+                for (int i = 0; i < question.RowCount; i++)
                 {
-                    sma.Save();
-                    answers.Save();
-                    //question.Save();
-                    //SetContentResult(true);
+                    int questionID = question.QuestionID;
+                    bool isGridQuestion = question.QuestionTypeID == 5;
+
+                    SurveyMemberAnswer sma = new SurveyMemberAnswer();
+                    sma.getSurveyMemberAnswerByQuestionID(questionID);
+                    if (sma.RowCount > 0)
+                    {
+                        sma.DeleteAll();
+                        sma.Save();
+                    }
+
+                    if (isGridQuestion)
+                    {
+                        Question subs = new Question();
+                        subs.GetSubQuestionsByQuestionID(questionID);
+                        if (subs.RowCount > 0)
+                        {
+                            for (int j = 0; j < subs.RowCount; j++)
+                            {
+                                SurveyMemberAnswer subAnswers = new SurveyMemberAnswer();
+                                subAnswers.getSurveyMemberAnswerByQuestionID(subs.QuestionID);
+                                if (subAnswers.RowCount > 0)
+                                {
+                                    subAnswers.DeleteAll();
+                                    subAnswers.Save();
+                                }
+
+                                Answer subQuestionAnswers = new Answer();
+                                subQuestionAnswers.getAnswersByQuestionID(subs.QuestionID);
+                                if (subQuestionAnswers.RowCount > 0)
+                                {
+                                    subQuestionAnswers.DeleteAll();
+                                    subQuestionAnswers.Save();
+                                }
+
+                                subs.MoveNext();
+                            }
+
+                            subs.Rewind();
+                            subs.DeleteAll();
+                            subs.Save();
+                        }
+                    }
+
+                    Answer answers = new Answer();
+                    answers.getAnswersByQuestionID(questionID);
+                    if (answers.RowCount > 0)
+                    {
+                        answers.DeleteAll();
+                        answers.Save();
+                    }
+
+                    Question currentQuestion = new Question();
+                    if (currentQuestion.LoadByPrimaryKey(questionID))
+                    {
+                        currentQuestion.MarkAsDeleted();
+                        currentQuestion.Save();
+                    }
+
+                    question.MoveNext();
                 }
-                catch (Exception ex)
+
+                if (branchs.RowCount > 0)
                 {
-                    //SetContentResult(false);
+                    for (int i = 0; i < branchs.RowCount; i++)
+                    {
+                        object branchIdValue = branchs.GetColumn("QuestionBranchID");
+                        int branchId = 0;
+
+                        QuestionBranch currentBranch = new QuestionBranch();
+                        if (branchIdValue != null &&
+                            branchIdValue != DBNull.Value &&
+                            int.TryParse(branchIdValue.ToString(), out branchId) &&
+                            currentBranch.LoadByPrimaryKey(branchId))
+                        {
+                            currentBranch.MarkAsDeleted();
+                            currentBranch.Save();
+                        }
+
+                        branchs.MoveNext();
+                    }
                 }
-                question.MoveNext();
+
+                if (cats.RowCount > 0)
+                {
+                    for (int i = 0; i < cats.RowCount; i++)
+                    {
+                        object categoryIdValue = cats.GetColumn("CategoryID");
+                        int categoryId = 0;
+
+                        QuestionCategory currentCategory = new QuestionCategory();
+                        if (categoryIdValue != null &&
+                            categoryIdValue != DBNull.Value &&
+                            int.TryParse(categoryIdValue.ToString(), out categoryId) &&
+                            currentCategory.LoadByPrimaryKey(categoryId))
+                        {
+                            currentCategory.MarkAsDeleted();
+                            currentCategory.Save();
+                        }
+
+                        cats.MoveNext();
+                    }
+                }
+
+                if (members.RowCount > 0)
+                {
+                    for (int i = 0; i < members.RowCount; i++)
+                    {
+                        int memberId = members.MemberID;
+                        SurveyMember currentMember = new SurveyMember();
+                        if (currentMember.LoadByPrimaryKey(memberId))
+                        {
+                            currentMember.MarkAsDeleted();
+                            currentMember.Save();
+                        }
+
+                        members.MoveNext();
+                    }
+                }
+
+                survey.MarkAsDeleted();
+                survey.Save();
+                SetContentResult(new { success = true, message = string.Empty });
             }
-            question.Save();
-            branchs.DeleteAll();
-            branchs.Save();
-            cats.DeleteAll();
-            cats.Save();
-            members.DeleteAll();
-            members.Save();
-            survey.MarkAsDeleted();
-            survey.Save();
-            SetContentResult(false);
+            catch (Exception ex)
+            {
+                SetContentResult(new { success = false, message = ex.Message });
+            }
         }
         #endregion
 
