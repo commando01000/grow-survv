@@ -460,7 +460,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=Round(Fields!AnsPercentage.Value,2)</Value>
+                              <Value>=IIF(Sum(Fields!AnswersCount.Value, "QuestionID") = 0, 0, Round((Fields!AnswersCount.Value * 100.0) / Sum(Fields!AnswersCount.Value, "QuestionID"), 2))</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
@@ -541,7 +541,7 @@
                               <ChartDataPoint>
                                 <ChartDataPointValues>
                                   <X>=Fields!EnName.Value</X>
-                                  <Y>=Sum(Fields!AnsPercentage.Value)</Y>
+                                  <Y>=IIF(Sum(Fields!AnswersCount.Value, "QuestionID") = 0, 0, Round((Sum(Fields!AnswersCount.Value) * 100.0) / Sum(Fields!AnswersCount.Value, "QuestionID"), 2))</Y>
                                 </ChartDataPointValues>
                                 <ChartDataLabel>
                                   <Style />
