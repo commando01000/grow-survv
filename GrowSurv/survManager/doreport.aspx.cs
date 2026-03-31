@@ -309,10 +309,13 @@ namespace GrowSurv.survManager
 
                     if (member.LoadByPrimaryKey(surveyMemberId))
                     {
-                        if (!member.IsColumnNull(SurveyMember.ColumnNames.HiringDate))
+                        bool hasHiringDateColumn = member.DefaultView.Table.Columns.Contains(SurveyMember.ColumnNames.HiringDate);
+                        bool hasRecentPromotionDateColumn = member.DefaultView.Table.Columns.Contains(SurveyMember.ColumnNames.RecentPromotionDate);
+
+                        if (hasHiringDateColumn && !member.IsColumnNull(SurveyMember.ColumnNames.HiringDate))
                             hiringDate = member.HiringDate.ToString("yyyy-MM-dd");
 
-                        if (!member.IsColumnNull(SurveyMember.ColumnNames.RecentPromotionDate))
+                        if (hasRecentPromotionDateColumn && !member.IsColumnNull(SurveyMember.ColumnNames.RecentPromotionDate))
                             recentPromotionDate = member.RecentPromotionDate.ToString("yyyy-MM-dd");
                     }
 
