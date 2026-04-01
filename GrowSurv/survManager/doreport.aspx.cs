@@ -141,7 +141,10 @@ namespace GrowSurv.survManager
                             gsbysurveyIDByGroup.ClearBeforeFill = true;
                             int surveyIDByGroup = 0;
                             if (int.TryParse(Request.QueryString["sid"].ToString(), out surveyIDByGroup))
-                                rds.Value = gsbysurveyIDByGroup.GetData(surveyIDByGroup);
+                                rds.Value = BuildGroupedStatisticsData(
+                                    gsbysurveyIDByGroup.GetData(surveyIDByGroup),
+                                    Request.QueryString["g"],
+                                    Request.QueryString["lang"]);
                             else
                                 return;
                             ReportViewer1.LocalReport.ReportPath = "Reports\\" + lang + "StatisticsReportWithGrouping.rdlc";
@@ -283,6 +286,57 @@ namespace GrowSurv.survManager
 
         }
 
+        private static DataTable BuildGroupedStatisticsData(
+            GSDataSet.GetStatisticsBySurveyIDWithGroupingDataTable source,
+            string groupColumnName,
+            string language)
+        {
+            DataTable data = source.Clone();
+            if (source == null || source.Rows.Count == 0)
+                return data;
+
+            string answerColumnName = string.Equals(language, "ar", StringComparison.OrdinalIgnoreCase)
+                ? "ArName"
+                : "EnName";
+
+            var mergedRows = source.AsEnumerable()
+                .Select((row, index) => new
+                {
+                    Row = row,
+                    Index = index,
+                    QuestionKey = GetQuestionKey(row),
+                    GroupValue = GetNormalizedColumnValue(row, groupColumnName),
+                    AnswerValue = GetNormalizedAnswerValue(row, answerColumnName)
+                })
+                .GroupBy(item => new
+                {
+                    item.QuestionKey,
+                    item.GroupValue,
+                    item.AnswerValue
+                })
+                .OrderBy(group => group.Min(item => item.Index));
+
+            foreach (var group in mergedRows)
+            {
+                DataRow firstRow = group.OrderBy(item => item.Index).First().Row;
+                DataRow mergedRow = data.NewRow();
+                mergedRow.ItemArray = (object[])firstRow.ItemArray.Clone();
+
+                if (data.Columns.Contains("AnswersCount"))
+                {
+                    mergedRow["AnswersCount"] = group.Sum(item =>
+                        item.Row.IsNull("AnswersCount") ? 0 : Convert.ToInt32(item.Row["AnswersCount"]));
+                }
+
+                if (data.Columns.Contains("AnsPercentage"))
+                    mergedRow["AnsPercentage"] = 0m;
+
+                data.Rows.Add(mergedRow);
+            }
+
+            return data;
+        }
+
         private static DataTable BuildDetailedSurveyAnswersData(GSDataSet.GetSurveyAnswerDetailsBySurveyIDAndMemberIDDataTable source)
         {
             DataTable data = source.Copy();
@@ -327,6 +381,43 @@ namespace GrowSurv.survManager
             }
 
             return data;
+        }
+
+        private static int GetQuestionKey(DataRow row)
+        {
+            if (row.Table.Columns.Contains("QuestionID") && !row.IsNull("QuestionID"))
+                return Convert.ToInt32(row["QuestionID"]);
+
+            if (row.Table.Columns.Contains("QuestionID1") && !row.IsNull("QuestionID1"))
+                return Convert.ToInt32(row["QuestionID1"]);
+
+            return 0;
+        }
+
+        private static string GetNormalizedAnswerValue(DataRow row, string preferredColumnName)
+        {
+            foreach (string columnName in new[] { preferredColumnName, "AnswerText", "EnName", "ArName" }.Distinct())
+            {
+                string value = GetNormalizedColumnValue(row, columnName);
+                if (!string.IsNullOrEmpty(value))
+                    return value;
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetNormalizedColumnValue(DataRow row, string columnName)
+        {
+            if (row == null ||
+                row.Table == null ||
+                string.IsNullOrWhiteSpace(columnName) ||
+                !row.Table.Columns.Contains(columnName) ||
+                row.IsNull(columnName))
+            {
+                return string.Empty;
+            }
+
+            return Convert.ToString(row[columnName]).Trim();
         }
     }
 }
