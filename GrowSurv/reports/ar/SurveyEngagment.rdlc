@@ -432,15 +432,15 @@
             <ChartMember>
               <Group Name="Chart2_CategoryGroup">
                 <GroupExpressions>
-                  <GroupExpression>=Fields!EnName.Value</GroupExpression>
+                  <GroupExpression>=IIF(IsNothing(Fields!EnName.Value) OR Trim(Fields!EnName.Value) = "", "N/A", Fields!EnName.Value)</GroupExpression>
                 </GroupExpressions>
               </Group>
               <SortExpressions>
                 <SortExpression>
-                  <Value>=Fields!EnName.Value</Value>
+                  <Value>=IIF(IsNothing(Fields!EnName.Value) OR Trim(Fields!EnName.Value) = "", "N/A", Fields!EnName.Value)</Value>
                 </SortExpression>
               </SortExpressions>
-              <Label>=Fields!EnName.Value</Label>
+              <Label>=IIF(IsNothing(Fields!EnName.Value) OR Trim(Fields!EnName.Value) = "", "N/A", Fields!EnName.Value)</Label>
             </ChartMember>
           </ChartMembers>
         </ChartCategoryHierarchy>
@@ -3292,15 +3292,15 @@
             <ChartMember>
               <Group Name="Chart2_CategoryGroup2">
                 <GroupExpressions>
-                  <GroupExpression>=Fields!EnName.Value</GroupExpression>
+                  <GroupExpression>=IIF(IsNothing(Fields!EnName.Value) OR Trim(Fields!EnName.Value) = "", "N/A", Fields!EnName.Value)</GroupExpression>
                 </GroupExpressions>
               </Group>
               <SortExpressions>
                 <SortExpression>
-                  <Value>=Fields!EnName.Value</Value>
+                  <Value>=IIF(IsNothing(Fields!EnName.Value) OR Trim(Fields!EnName.Value) = "", "N/A", Fields!EnName.Value)</Value>
                 </SortExpression>
               </SortExpressions>
-              <Label>=Fields!EnName.Value</Label>
+              <Label>=IIF(IsNothing(Fields!EnName.Value) OR Trim(Fields!EnName.Value) = "", "N/A", Fields!EnName.Value)</Label>
             </ChartMember>
           </ChartMembers>
         </ChartCategoryHierarchy>

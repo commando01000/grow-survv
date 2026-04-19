@@ -240,7 +240,7 @@ namespace GrowSurv.survManager
                             {
                                 int memberid = 0;
                                 int.TryParse(Request.QueryString["mid"].ToString(), out memberid);
-                                rds.Value = BuildDetailedSurveyAnswersData(gsabysurveyID.GetData(surveyID_ans, memberid));
+                                rds.Value = BuildDetailedSurveyAnswersData(gsabysurveyID.GetData(surveyID_ans, memberid), Request.QueryString["lang"].ToString());
                                 ReportViewer1.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(LocalReport_SubreportProcessing_subQuestion);
                             }
                             else
@@ -337,9 +337,11 @@ namespace GrowSurv.survManager
             return data;
         }
 
-        private static DataTable BuildDetailedSurveyAnswersData(GSDataSet.GetSurveyAnswerDetailsBySurveyIDAndMemberIDDataTable source)
+        private static DataTable BuildDetailedSurveyAnswersData(GSDataSet.GetSurveyAnswerDetailsBySurveyIDAndMemberIDDataTable source, string language)
         {
             DataTable data = source.Copy();
+            foreach (DataColumn column in data.Columns)
+                column.ReadOnly = false;
 
             if (!data.Columns.Contains("HiringDateDisplay"))
                 data.Columns.Add("HiringDateDisplay", typeof(string));
@@ -347,7 +349,7 @@ namespace GrowSurv.survManager
             if (!data.Columns.Contains("RecentPromotionDateDisplay"))
                 data.Columns.Add("RecentPromotionDateDisplay", typeof(string));
 
-            Dictionary<int, Tuple<string, string>> memberDates = new Dictionary<int, Tuple<string, string>>();
+            Dictionary<int, Dictionary<string, string>> memberValues = new Dictionary<int, Dictionary<string, string>>();
 
             foreach (DataRow row in data.Rows)
             {
@@ -355,32 +357,146 @@ namespace GrowSurv.survManager
                     continue;
 
                 int surveyMemberId = Convert.ToInt32(row["SurveyMemberID"]);
-                if (!memberDates.ContainsKey(surveyMemberId))
+                if (!memberValues.ContainsKey(surveyMemberId))
                 {
                     SurveyMember member = new SurveyMember();
-                    string hiringDate = string.Empty;
-                    string recentPromotionDate = string.Empty;
+                    Dictionary<string, string> values = new Dictionary<string, string>();
 
                     if (member.LoadByPrimaryKey(surveyMemberId))
                     {
                         bool hasHiringDateColumn = member.DefaultView.Table.Columns.Contains(SurveyMember.ColumnNames.HiringDate);
                         bool hasRecentPromotionDateColumn = member.DefaultView.Table.Columns.Contains(SurveyMember.ColumnNames.RecentPromotionDate);
 
-                        if (hasHiringDateColumn && !member.IsColumnNull(SurveyMember.ColumnNames.HiringDate))
-                            hiringDate = member.HiringDate.ToString("yyyy-MM-dd");
+                        values["HiringDateDisplay"] = hasHiringDateColumn && !member.IsColumnNull(SurveyMember.ColumnNames.HiringDate)
+                            ? member.HiringDate.ToString("yyyy-MM-dd")
+                            : string.Empty;
 
-                        if (hasRecentPromotionDateColumn && !member.IsColumnNull(SurveyMember.ColumnNames.RecentPromotionDate))
-                            recentPromotionDate = member.RecentPromotionDate.ToString("yyyy-MM-dd");
+                        values["RecentPromotionDateDisplay"] = hasRecentPromotionDateColumn && !member.IsColumnNull(SurveyMember.ColumnNames.RecentPromotionDate)
+                            ? member.RecentPromotionDate.ToString("yyyy-MM-dd")
+                            : string.Empty;
+
+                        values["Country"] = GetCountryName(GetMemberInt(member, "CountryID", row), language);
+                        values["Gov"] = GetGovernrateName(GetMemberInt(member, "GovernrateID", row), language);
+                        values["Branch"] = GetBranchName(GetMemberInt(member, "BranchID", row), language);
+                        values["Area"] = GetAreaName(GetMemberInt(member, "AreaID", row), language);
+                        values["Department"] = GetDepartmentName(GetMemberInt(member, "DepartmentID", row), language);
+                        values["Division"] = GetDivisionName(GetMemberInt(member, "DivionID", row, "DivisionID"), language);
+                        values["Grade"] = GetGradeName(GetMemberInt(member, "GradeID", row), language);
+                        values["AgeGroup"] = GetAgeGroupName(GetMemberInt(member, "AgeGroupID", row), language);
+                        values["Gender"] = GetGenderName(GetMemberInt(member, "GenderID", row), language);
+                        values["JobTitle"] = GetJobTitleName(GetMemberInt(member, "JobTitleID", row), language);
+                        values["Level"] = GetLevelName(GetMemberInt(member, "LevelID", row), language);
                     }
 
-                    memberDates[surveyMemberId] = Tuple.Create(hiringDate, recentPromotionDate);
+                    memberValues[surveyMemberId] = values;
                 }
 
-                row["HiringDateDisplay"] = memberDates[surveyMemberId].Item1;
-                row["RecentPromotionDateDisplay"] = memberDates[surveyMemberId].Item2;
+                foreach (KeyValuePair<string, string> value in memberValues[surveyMemberId])
+                {
+                    if (data.Columns.Contains(value.Key) &&
+                        (row.IsNull(value.Key) || string.IsNullOrWhiteSpace(row[value.Key].ToString())))
+                    {
+                        row[value.Key] = value.Value;
+                    }
+                }
             }
 
             return data;
+        }
+
+        private static int GetMemberInt(SurveyMember member, string memberColumnName, DataRow reportRow, string reportColumnName = null)
+        {
+            int value = 0;
+            if (member.DefaultView.Table.Columns.Contains(memberColumnName) && !member.IsColumnNull(memberColumnName))
+            {
+                object rawValue = member.GetColumn(memberColumnName);
+                int.TryParse(rawValue == null ? string.Empty : rawValue.ToString(), out value);
+            }
+
+            string fallbackColumnName = string.IsNullOrWhiteSpace(reportColumnName) ? memberColumnName : reportColumnName;
+            if (value == 0 &&
+                reportRow != null &&
+                reportRow.Table.Columns.Contains(fallbackColumnName) &&
+                !reportRow.IsNull(fallbackColumnName))
+            {
+                int.TryParse(reportRow[fallbackColumnName].ToString(), out value);
+            }
+
+            return value;
+        }
+
+        private static string GetCountryName(int id, string language)
+        {
+            Country entity = new Country();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnName, entity.ArName, language) : string.Empty;
+        }
+
+        private static string GetGovernrateName(int id, string language)
+        {
+            Governrate entity = new Governrate();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnName, entity.ArName, language) : string.Empty;
+        }
+
+        private static string GetBranchName(int id, string language)
+        {
+            Branch entity = new Branch();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.NameEn, entity.NameAr, language) : string.Empty;
+        }
+
+        private static string GetAreaName(int id, string language)
+        {
+            Area entity = new Area();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.NameEn, entity.NameAr, language) : string.Empty;
+        }
+
+        private static string GetDepartmentName(int id, string language)
+        {
+            Department entity = new Department();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnName, entity.ArName, language) : string.Empty;
+        }
+
+        private static string GetDivisionName(int id, string language)
+        {
+            Division entity = new Division();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.NameEn, entity.NameAr, language) : string.Empty;
+        }
+
+        private static string GetGradeName(int id, string language)
+        {
+            Grade entity = new Grade();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnName, entity.ArName, language) : string.Empty;
+        }
+
+        private static string GetAgeGroupName(int id, string language)
+        {
+            AgeGroup entity = new AgeGroup();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnDisplayName, entity.ArDisplayName, language) : string.Empty;
+        }
+
+        private static string GetGenderName(int id, string language)
+        {
+            Gender entity = new Gender();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.NameEn, entity.NameAr, language) : string.Empty;
+        }
+
+        private static string GetJobTitleName(int id, string language)
+        {
+            JobTitle entity = new JobTitle();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnName, entity.ArName, language) : string.Empty;
+        }
+
+        private static string GetLevelName(int id, string language)
+        {
+            Level entity = new Level();
+            return id > 0 && entity.LoadByPrimaryKey(id) ? GetLocalizedName(entity.EnName, entity.ArName, language) : string.Empty;
+        }
+
+        private static string GetLocalizedName(string englishName, string arabicName, string language)
+        {
+            if (string.Equals(language, "ar", StringComparison.OrdinalIgnoreCase))
+                return string.IsNullOrWhiteSpace(arabicName) ? englishName : arabicName;
+
+            return string.IsNullOrWhiteSpace(englishName) ? arabicName : englishName;
         }
 
         private static int GetQuestionKey(DataRow row)

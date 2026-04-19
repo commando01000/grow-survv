@@ -378,19 +378,9 @@
 
             function sendDataToServer(survey, IsSubmitted) {
                 survey.stopTimer();
-                var resultAsString = JSON.stringify(survey.data);
                 var surveyid = $('#<%= uiHiddenFieldsurveyID.ClientID %>').val();
                 var membermail = $('#<%= uiHiddenFieldMemberID.ClientID %>').val();
                 var NotSubmitted = (IsSubmitted == false);
-                $.ajax({
-                    type: 'POST',
-                    url: '../common/common.asmx/submitSurveyAsJson',
-                    data: JSON.stringify({ SurveyID: surveyid, member: membermail, surveydata: survey.data, IsSubmitted: !NotSubmitted }),
-                    contentType: 'application/json',
-                    dataType: 'application/json'
-                }).done(function () {
-
-                });
 
                 var conID = 0, govID = 0, areaID = 0, branchID = 0, departmentID = 0, divisionID = 0, level = 0, grade = 0, jobTitle = 0, ageGroup = 0, gender = 0, hiringDate = "", recentPromotionDate = "";
                 if ($('#<%= uiDropDownListCon.ClientID%>').val() != "")
@@ -428,9 +418,23 @@
                         divisionID: divisionID, level: level, grade: grade, jobTitle: jobTitle, ageGroup: ageGroup, gender: gender, hiringDate: hiringDate, recentPromotionDate: recentPromotionDate, durationInSeconds: survey.timeSpent
                     }),
                     contentType: 'application/json',
-                    dataType: 'application/json'
+                    dataType: 'json'
                 }).done(function () {
-
+                    $.ajax({
+                        type: 'POST',
+                        url: '../common/common.asmx/submitSurveyAsJson',
+                        data: JSON.stringify({ SurveyID: surveyid, member: membermail, surveydata: survey.data, IsSubmitted: !NotSubmitted }),
+                        contentType: 'application/json',
+                        dataType: 'json'
+                    }).fail(function () {
+                        $('#modalTitle').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Error" : "خطأ");
+                        $('#modalText').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Could not save survey answers. Please try again." : "تعذر حفظ إجابات الاستبيان. من فضلك حاول مرة أخرى.");
+                        $("#myModal").modal();
+                    });
+                }).fail(function () {
+                    $('#modalTitle').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Error" : "خطأ");
+                    $('#modalText').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Could not save demographic data. Please try again." : "تعذر حفظ البيانات الديموغرافية. من فضلك حاول مرة أخرى.");
+                    $("#myModal").modal();
                 });
 
                 //$.post("../common/common.asmx/submitSurveyAsJson", { SurveyID: surveyid, member: membermail, surveydata: resultAsString }).done(function () {

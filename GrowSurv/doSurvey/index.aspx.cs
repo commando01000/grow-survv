@@ -100,14 +100,9 @@ namespace GrowSurv.doSurvey
                     }
                     else // public survey
                     {
-                        SurveyMember mem = new SurveyMember();
-                        mem.AddNew();
-                        mem.MemberEmail = "p_" + Guid.NewGuid() + "_" + surveyID + "@growsurv.com";
-                        mem.SurveyID = SurveyID;
-                        mem.Save();
-                        member = mem.MemberEmail;
+                        member = GetOrCreatePublicSurveyMember(surveyID);
                     }
-                    BindSurveyInfo(SurveyID);
+                    BindSurveyInfo(SurveyID, member);
 
                 }
                 catch (Exception x)
@@ -120,11 +115,46 @@ namespace GrowSurv.doSurvey
             }
         }
 
+        private string GetOrCreatePublicSurveyMember(string surveyID)
+        {
+            string sessionKey = "_PublicSurveyMember_" + surveyID;
+            string member = Session[sessionKey] == null ? string.Empty : Session[sessionKey].ToString();
+
+            SurveyMember existingMember = new SurveyMember();
+            if (!string.IsNullOrWhiteSpace(member) && existingMember.GetMemberBySurveyIDAndMemberEmail(SurveyID, member))
+            {
+                if (existingMember.IsColumnNull(SurveyMember.ColumnNames.IsSurveySubmited) || !existingMember.IsSurveySubmited)
+                    return member;
+            }
+
+            SurveyMember mem = new SurveyMember();
+            mem.AddNew();
+            mem.MemberEmail = "p_" + Guid.NewGuid() + "_" + surveyID + "@growsurv.com";
+            mem.SurveyID = SurveyID;
+            mem.Save();
+
+            Session[sessionKey] = mem.MemberEmail;
+            return mem.MemberEmail;
+        }
+
+        private string GetCurrentMember()
+        {
+            if (!string.IsNullOrWhiteSpace(uiHiddenFieldMemberID.Value) && uiHiddenFieldMemberID.Value != "0")
+                return uiHiddenFieldMemberID.Value;
+
+            return TryDecryptQueryStringValue("mail");
+        }
+
         private void BindSurveyInfo(int surveyID)
         {
-            string member = TryDecryptQueryStringValue("mail");
+            BindSurveyInfo(surveyID, GetCurrentMember());
+        }
+
+        private void BindSurveyInfo(int surveyID, string member)
+        {
             SurveyMember mem = new SurveyMember();
-            mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, member);
+            if (!string.IsNullOrWhiteSpace(member))
+                mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, member);
 
             Survey survey = new Survey();
             survey.LoadByPrimaryKey(surveyID);
