@@ -45,7 +45,7 @@ namespace GrowSurv.common
         private static readonly string SmtpPass = "Tedorcg@01222468078"; // insert locally
 
         private static readonly string FromEmail = "survey@tedorcg.com";
-        private static readonly string SurveyBaseUrl = "http://grewsur.tedorcg.com/doSurvey/index.aspx";
+        private static readonly string SurveyBaseUrl = "https://grewsur.tedorcg.com/doSurvey/index.aspx";
 
         #region Survey Functions
         [WebMethod]
