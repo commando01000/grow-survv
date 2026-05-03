@@ -501,11 +501,11 @@ namespace GrowSurv.survManager
 
         private static int GetQuestionKey(DataRow row)
         {
-            if (row.Table.Columns.Contains("QuestionID") && !row.IsNull("QuestionID"))
-                return Convert.ToInt32(row["QuestionID"]);
-
             if (row.Table.Columns.Contains("QuestionID1") && !row.IsNull("QuestionID1"))
                 return Convert.ToInt32(row["QuestionID1"]);
+
+            if (row.Table.Columns.Contains("QuestionID") && !row.IsNull("QuestionID"))
+                return Convert.ToInt32(row["QuestionID"]);
 
             return 0;
         }
