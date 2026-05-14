@@ -695,7 +695,7 @@
                         <Paragraph>
                           <TextRuns>
                             <TextRun>
-                              <Value>=formatnumber(Sum(Fields!Evaluation.Value),4)</Value>
+                              <Value>=formatnumber(Sum(Fields!Evaluation.Value*Fields!QWeight.Value),4)</Value>
                               <Style />
                             </TextRun>
                           </TextRuns>
