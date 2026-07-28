@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -38,8 +39,8 @@ namespace GrowSurv.common
         // === Static SMTP Settings (TEMP) ===
         // ⚠️ Do NOT commit real password to git.
         private static readonly string SmtpHost = "mail5013.site4now.net";
-        private static readonly int SmtpPort = 25; // Port 25 is standard for relaying on SmarterASP.net
-        private static readonly bool SmtpEnableSsl = false; // Port 25 usually does not use SSL
+        private static readonly int SmtpPort = 587; // Port 25 is standard for relaying on SmarterASP.net
+        private static readonly bool SmtpEnableSsl = true; // Port 25 usually does not use SSL
 
         private static readonly string SmtpUser = "survey@tedorcg.com";
         private static readonly string SmtpPass = "Tedorcg@01222468078"; // insert locally
@@ -2139,10 +2140,39 @@ namespace GrowSurv.common
                 survey == null ? string.Empty : (survey.ArEmailBody ?? string.Empty),
                 HttpUtility.HtmlAttributeEncode(link)
             );
+            AttachSurveyEmailInlineImages(msg);
             msg.Headers.Add("X-Mailer", "GrowSurv");
             msg.Headers.Add("X-Auto-Response-Suppress", "OOF, DR, RN, NRN, AutoReply");
 
             return msg;
+        }
+
+        private void AttachSurveyEmailInlineImages(MailMessage msg)
+        {
+            var htmlView = AlternateView.CreateAlternateViewFromString(msg.Body, Encoding.UTF8, MediaTypeNames.Text.Html);
+
+            AddInlineImage(htmlView, "~/assets/global/img/final_logo.png", "growsurv-logo");
+            AddInlineImage(htmlView, "~/assets/pages/img/tcg.png", "tedor-logo");
+
+            msg.AlternateViews.Add(htmlView);
+        }
+
+        private void AddInlineImage(AlternateView htmlView, string virtualPath, string contentId)
+        {
+            HttpServerUtility server = HttpContext.Current == null ? null : HttpContext.Current.Server;
+            if (server == null)
+                return;
+
+            string imagePath = server.MapPath(virtualPath);
+            if (!File.Exists(imagePath))
+                return;
+
+            var image = new LinkedResource(imagePath, "image/png");
+            image.ContentId = contentId;
+            image.ContentType.Name = Path.GetFileName(imagePath);
+            image.TransferEncoding = TransferEncoding.Base64;
+
+            htmlView.LinkedResources.Add(image);
         }
 
         private SmtpClient CreateSmtpClient()

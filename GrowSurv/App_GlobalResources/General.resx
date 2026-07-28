@@ -118,131 +118,72 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EmailTemplate" xml:space="preserve">
-    <value>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
-&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+    <value>&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml" lang="en"&gt;
 &lt;head&gt;
     &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
-    &lt;meta name="viewport" content="width=device-width"/&gt;    
-
-    &lt;style type="text/css"&gt;
-    * {{ margin: 0; padding: 0; font-size: 100%; font-family: 'Avenir Next', "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; line-height: 1.65; }}
-
-img {{ max-width: 100%; margin: 0 auto; display: block; }}
-
-body, .body-wrap {{ width: 100% !important; height: 100%; background: #f8f8f8; }}
-
-a {{ color: #71bc37; text-decoration: none; }}
-
-a:hover {{ text-decoration: underline; }}
-
-.text-center {{ text-align: center; }}
-
-.text-right {{ text-align: right; }}
-
-.text-left {{ text-align: left; }}
-
-.button {{ display: inline-block; color: white; background: #71bc37; border: solid #71bc37; border-width: 10px 20px 8px; font-weight: bold; border-radius: 4px; }}
-
-.button:hover {{ text-decoration: none; }}
-
-h1, h2, h3, h4, h5, h6 {{ margin-bottom: 20px; line-height: 1.25; }}
-
-h1 {{ font-size: 32px; }}
-
-h2 {{ font-size: 28px; }}
-
-h3 {{ font-size: 24px; }}
-
-h4 {{ font-size: 20px; }}
-
-h5 {{ font-size: 16px; }}
-
-p, ul, ol {{ font-size: 16px; font-weight: normal; margin-bottom: 20px; }}
-
-.container {{ display: block !important; clear: both !important; margin: 0 auto !important; max-width: 580px !important; }}
-
-.container table {{ width: 100% !important; border-collapse: collapse; }}
-
-.container .masthead {{ padding: 30px 0; background: #c1deaa; color: white; }}
-
-.container .masthead h1 {{ margin: 0 auto !important; max-width: 90%; text-transform: uppercase; }}
-
-.container .content {{ background: white; padding: 30px 35px; }}
-
-.container .content.footer {{ background: none; }}
-
-.container .content.footer p {{ margin-bottom: 0; color: #888; text-align: center; font-size: 14px; }}
-
-.container .content.footer a {{ color: #888; text-decoration: none; font-weight: bold; }}
-
-.container .content.footer a:hover {{ text-decoration: underline; }}
-    &lt;/style&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+    &lt;meta name="x-apple-disable-message-reformatting" /&gt;
 &lt;/head&gt;
-&lt;body&gt;
-&lt;table class="body-wrap"&gt;
-    &lt;tr&gt;
-        &lt;td class="container"&gt;
-
-            &lt;!-- Message start --&gt;
-            &lt;table&gt;
-                &lt;tr&gt;
-                    &lt;td align="center" class="masthead"&gt;
-
-                        &lt;h1&gt;
-							&lt;img src="http://growsurv.com/assets/global/img/final_logo.png" /&gt;
-						&lt;/h1&gt;
-
-                    &lt;/td&gt;
-                &lt;/tr&gt;
-                &lt;tr&gt;
-                    &lt;td class="content"&gt;
-
-                        &lt;p&gt;
-                        {0}
-                        &lt;/p&gt;
-&lt;p&gt;
-                        
-                        &lt;/p&gt;&lt;p style="direction:rtl"&gt;
-                        {1}
-                        &lt;/p&gt;
-                        &lt;table&gt;
-                            &lt;tr&gt;
-                                &lt;td align="center"&gt;
-                                    &lt;p&gt;
-                                        &lt;a href="{2}" target="_blank" style="color:#fff !important" class="button"&gt;Start Survey&lt;/a&gt;
-                                    &lt;/p&gt;
-                                    &lt;p&gt;
-
-                                    &lt;/p&gt;
-                                    &lt;p&gt;
-                                        &lt;div style="display:inline-block"&gt;Warmest regards from &lt;img src="http://growsurv.com/assets/pages/img/tcg.png" width="70" style="display:inline-block;" /&gt;&lt;/div&gt;
-                                    &lt;/p&gt;
-                                &lt;/td&gt;
-                            &lt;/tr&gt;
-                        &lt;/table&gt;
-
-                    &lt;/td&gt;
-                &lt;/tr&gt;
-            &lt;/table&gt;
-
-        &lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-        &lt;td class="container"&gt;
-
-            &lt;!-- Message start --&gt;
-            &lt;table&gt;
-                &lt;tr&gt;
-                    &lt;td class="content footer" align="center"&gt;
-                        &lt;p&gt;Sent by &lt;a style="display:inline-block" href="http://growsurv.com"&gt;&lt;img src="http://growsurv.com/assets/global/img/final_logo.png" width="70" /&gt;&lt;/a&gt;, &amp;copy; All rights reserved.&lt;/p&gt;
-                        
-                    &lt;/td&gt;
-                &lt;/tr&gt;
-            &lt;/table&gt;
-
-        &lt;/td&gt;
-    &lt;/tr&gt;
-&lt;/table&gt;
+&lt;body style="margin:0; padding:0; background-color:#eef4f2; font-family:Arial, Helvetica, sans-serif; color:#25313b;"&gt;
+    &lt;div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;"&gt;You have been invited to complete a GrowSurv survey.&lt;/div&gt;
+    &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; background-color:#eef4f2; margin:0; padding:0;"&gt;
+        &lt;tr&gt;
+            &lt;td align="center" style="padding:32px 12px;"&gt;
+                &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="width:100%; max-width:640px; border-collapse:collapse;"&gt;
+                    &lt;tr&gt;
+                        &lt;td style="background-color:#ffffff; border-radius:8px 8px 0 0; padding:28px 32px 20px 32px; border-bottom:4px solid #80b943;"&gt;
+                            &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; border-collapse:collapse;"&gt;
+                                &lt;tr&gt;
+                                    &lt;td align="left" style="vertical-align:middle;"&gt;
+                                        &lt;img src="cid:growsurv-logo" width="150" alt="GrowSurv" style="display:block; border:0; width:150px; max-width:150px; height:auto;" /&gt;
+                                    &lt;/td&gt;
+                                    &lt;td align="right" style="vertical-align:middle; font-size:12px; line-height:18px; color:#6d7c87; text-transform:uppercase; letter-spacing:.6px;"&gt;
+                                        Survey Invitation
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            &lt;/table&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                    &lt;tr&gt;
+                        &lt;td style="background-color:#ffffff; padding:32px; border-bottom:1px solid #dfe7e4;"&gt;
+                            &lt;h1 style="margin:0 0 14px 0; font-size:24px; line-height:32px; font-weight:600; color:#1f2d3a;"&gt;Your feedback matters&lt;/h1&gt;
+                            &lt;p style="margin:0 0 22px 0; font-size:15px; line-height:24px; color:#5b6872;"&gt;Please take a few minutes to complete this survey. Your responses help us improve the quality of our services.&lt;/p&gt;
+                            &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; border-collapse:collapse;"&gt;
+                                &lt;tr&gt;
+                                    &lt;td style="padding:18px 20px; background-color:#f7faf9; border:1px solid #e1e9e6; border-radius:6px; font-size:15px; line-height:24px; color:#2f3d48;"&gt;
+                                        {0}
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                                &lt;tr&gt;
+                                    &lt;td dir="rtl" align="right" style="padding:18px 20px; background-color:#f7faf9; border:1px solid #e1e9e6; border-radius:6px; font-size:15px; line-height:26px; color:#2f3d48; font-family:Tahoma, Arial, Helvetica, sans-serif;"&gt;
+                                        {1}
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            &lt;/table&gt;
+                            &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:30px auto 18px auto; border-collapse:collapse;"&gt;
+                                &lt;tr&gt;
+                                    &lt;td align="center" bgcolor="#1aa6b7" style="border-radius:5px;"&gt;
+                                        &lt;a href="{2}" target="_blank" style="display:inline-block; padding:14px 28px; font-size:15px; line-height:18px; font-weight:bold; color:#ffffff; text-decoration:none; border-radius:5px; background-color:#1aa6b7;"&gt;Start Survey&lt;/a&gt;
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            &lt;/table&gt;
+                            &lt;p style="margin:0; font-size:12px; line-height:20px; color:#7b8790; text-align:center;"&gt;If the button does not work, open this link in your browser:&lt;br /&gt;
+                                &lt;a href="{2}" target="_blank" style="color:#1a7f90; text-decoration:underline; word-break:break-all;"&gt;{2}&lt;/a&gt;
+                            &lt;/p&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                    &lt;tr&gt;
+                        &lt;td style="background-color:#f9fbfa; border-radius:0 0 8px 8px; padding:22px 32px; text-align:center;"&gt;
+                            &lt;p style="margin:0 0 10px 0; font-size:13px; line-height:20px; color:#64727d;"&gt;Warmest regards from&lt;/p&gt;
+                            &lt;img src="cid:tedor-logo" width="120" alt="Tedor Consulting Group" style="display:inline-block; border:0; width:120px; max-width:120px; height:auto;" /&gt;
+                            &lt;p style="margin:14px 0 0 0; font-size:12px; line-height:18px; color:#8a969e;"&gt;Sent by GrowSurv. Copyright All rights reserved.&lt;/p&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                &lt;/table&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
 &lt;/body&gt;
 &lt;/html&gt;</value>
   </data>
