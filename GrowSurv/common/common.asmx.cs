@@ -2138,7 +2138,8 @@ namespace GrowSurv.common
                 template,
                 survey == null ? string.Empty : (survey.EmailBody ?? string.Empty),
                 survey == null ? string.Empty : (survey.ArEmailBody ?? string.Empty),
-                HttpUtility.HtmlAttributeEncode(link)
+                HttpUtility.HtmlAttributeEncode(link),
+                survey == null ? string.Empty : (survey.EmailSubject ?? string.Empty)
             );
             AttachSurveyEmailInlineImages(msg);
             msg.Headers.Add("X-Mailer", "GrowSurv");

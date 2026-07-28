@@ -147,7 +147,7 @@
                     &lt;/tr&gt;
                     &lt;tr&gt;
                         &lt;td style="background-color:#ffffff; padding:32px; border-bottom:1px solid #dfe7e4;"&gt;
-                            &lt;h1 style="margin:0 0 14px 0; font-size:24px; line-height:32px; font-weight:600; color:#1f2d3a;"&gt;Your feedback matters&lt;/h1&gt;
+                            &lt;h1 style="margin:0 0 14px 0; font-size:24px; line-height:32px; font-weight:600; color:#1f2d3a;"&gt;{3}&lt;/h1&gt;
                             &lt;p style="margin:0 0 22px 0; font-size:15px; line-height:24px; color:#5b6872;"&gt;Please take a few minutes to complete this survey. Your responses help us improve the quality of our services.&lt;/p&gt;
                             &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; border-collapse:collapse;"&gt;
                                 &lt;tr&gt;
