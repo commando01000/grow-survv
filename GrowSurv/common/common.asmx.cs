@@ -838,6 +838,7 @@ namespace GrowSurv.common
                 QuestionTypeID = survs.IsColumnNull("QuestionTypeID") ? 0 : survs.QuestionTypeID,
                 QuestionOrder = survs.QuestionOrder,
                 Weight = survs.Weight,
+                IsMandatory = survs.IsColumnNull("IsMandatory") ? false : survs.IsMandatory,
                 CategoryID = survs.IsColumnNull("QuestionCatergoryID") ? 0 : survs.QuestionCatergoryID,
                 BranchID = survs.IsColumnNull("QuestionBranchID") ? 0 : survs.QuestionBranchID,
                 SurveyID = survs.SurveyID
