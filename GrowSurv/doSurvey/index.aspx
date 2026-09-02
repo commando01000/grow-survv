@@ -63,6 +63,39 @@
             background-color: rgba(255, 255, 255, 0.5);
             font-size: 16px;
         }
+        .survey-loading {
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 35px 15px;
+        }
+
+        .survey-loading-box {
+            color: #586069;
+            font-size: 16px;
+        }
+
+        .survey-loading-spinner {
+            width: 42px;
+            height: 42px;
+            border: 4px solid #e5e5e5;
+            border-top-color: #1ab394;
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            animation: survey-loading-spin 0.8s linear infinite;
+        }
+
+        @keyframes survey-loading-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .survey-load-error {
+            color: #a94442;
+        }
     </style>
 </head>
 <body>
@@ -239,6 +272,12 @@
                     <p style="padding: 5px; text-align: center">
                         <asp:Literal ID="uiLiteralHeader" runat="server"></asp:Literal>
                     </p>
+                    <div id="surveyLoading" class="survey-loading">
+                        <div class="survey-loading-box">
+                            <div class="survey-loading-spinner"></div>
+                            <div class="survey-loading-text">Loading survey questions...</div>
+                        </div>
+                    </div>
                     <div id="surveyContainer"></div>
 
                     <div style="float: right" id="SaveAndContinue">
@@ -308,8 +347,20 @@
                 var showb = $('#<%= uiHiddenFieldsurveyID.ClientID %>').val();
                 var lang = $('#<%= uiHiddenFieldCurrentLang.ClientID %>').val();
                 var membermail = $('#<%= uiHiddenFieldMemberID.ClientID %>').val();
+                function setSurveyLoading(isLoading, isError) {
+                    var loadingText = lang == "en"
+                        ? (isError ? "Could not load survey questions. Please refresh and try again." : "Loading survey questions...")
+                        : (isError ? "تعذر تحميل أسئلة الاستبيان. من فضلك قم بتحديث الصفحة وحاول مرة أخرى." : "جاري تحميل أسئلة الاستبيان...");
+
+                    $("#surveyLoading .survey-loading-text").text(loadingText);
+                    $("#surveyLoading").toggle(isLoading || isError).toggleClass("survey-load-error", !!isError);
+                    $("#surveyContainer").toggle(!isLoading && !isError);
+                }
 
                 var surveyJSON;
+                setSurveyLoading(true, false);
+                $("#SaveAndContinue").css('display', 'none');
+
                 $.get("../common/common.asmx/getSurveyAsJson?SurveyID=" + showb + "&lang=" + lang + "&memberMail=" + membermail, function (data) {
                     var surveyJSON = data.survey;
                     Survey.defaultStandardCss.progressBar = "bar-green";
@@ -334,6 +385,10 @@
                         });
                         setTimeout(function () { $('.sv_container .sv_nav').append($("#SaveAndContinue")); }, 300);
                     }
+                }).done(function () {
+                    setSurveyLoading(false, false);
+                }).fail(function () {
+                    setSurveyLoading(false, true);
                 });
 
 

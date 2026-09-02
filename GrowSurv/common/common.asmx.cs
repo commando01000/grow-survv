@@ -35,6 +35,13 @@ namespace GrowSurv.common
         {
             return "Hello World";
         }
+        private static string GetLocalizedText(string lang, string enText, string arText)
+        {
+            string preferredText = lang == "en" ? enText : arText;
+            string fallbackText = lang == "en" ? arText : enText;
+
+            return string.IsNullOrWhiteSpace(preferredText) ? (fallbackText ?? string.Empty) : preferredText;
+        }
 
         // === Static SMTP Settings (TEMP) ===
         // ⚠️ Do NOT commit real password to git.
@@ -918,7 +925,7 @@ namespace GrowSurv.common
             Survey survey = new Survey();
             survey.LoadByPrimaryKey(SurveyID);
             SurveyJson surveyJson = new Models.SurveyJson();
-            surveyJson.title = lang == "en" ? survey.EnName : survey.ArName;
+            surveyJson.title = GetLocalizedText(lang, survey.EnName, survey.ArName);
             surveyJson.pages = new List<Models.PageJson>();
             double timeToFinish = 0;
             if (!survey.IsColumnNull("SurveyTypeID") && !survey.IsColumnNull("Duration"))
@@ -944,7 +951,7 @@ namespace GrowSurv.common
             int pageCount = -1;
             for (int j = 0; j < Categories.RowCount; j++)
             {
-                surveyJson.pages.Add(new PageJson() { name = lang == "en" ? Categories.EnName : Categories.ArName, title = lang == "en" ? Categories.EnName : Categories.ArName, questions = new List<QuestionJson>(), visibleIf = "", navigationButtonsVisibility = "show" });
+                surveyJson.pages.Add(new PageJson() { name = GetLocalizedText(lang, Categories.EnName, Categories.ArName), title = GetLocalizedText(lang, Categories.EnName, Categories.ArName), questions = new List<QuestionJson>(), visibleIf = "", navigationButtonsVisibility = "show" });
                 pageCount++;
                 Question questionsMain = new Question();
                 questionsMain.GetSurveyQuestionsBySurveyIDAndCategoryID(SurveyID, Categories.CategoryID);
@@ -958,8 +965,8 @@ namespace GrowSurv.common
                     answers.getAnswersByQuestionID(questionsMain.QuestionID);
                     for (int k = 0; k < answers.RowCount; k++)
                     {
-                        answersJson.Add(new item { text = lang == "en" ? answers.EnName : answers.ArName, value = answers.AnswerID.ToString() });
-                        columns.Add(new item() { text = lang == "en" ? answers.EnName : answers.ArName, value = answers.AnswerID.ToString() });
+                        answersJson.Add(new item { text = GetLocalizedText(lang, answers.EnName, answers.ArName), value = answers.AnswerID.ToString() });
+                        columns.Add(new item() { text = GetLocalizedText(lang, answers.EnName, answers.ArName), value = answers.AnswerID.ToString() });
                         answers.MoveNext();
                     }
 
@@ -979,7 +986,7 @@ namespace GrowSurv.common
                                 name = questionsMain.QuestionID.ToString(),
                                 type = qtype,
                                 isRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
-                                title = lang == "en" ? questionsMain.EnTitle : questionsMain.ArTitle,
+                                title = GetLocalizedText(lang, questionsMain.EnTitle, questionsMain.ArTitle),
                                 choices = answersJson,
                                 visibleIf = questionsMain.IsColumnNull("PQuestionID") ? "" : "{" + questionsMain.GetColumn("PQuestionID").ToString() + "} = '" + questionsMain.GetColumn("AnswerID") + "'"
                             });
@@ -990,7 +997,7 @@ namespace GrowSurv.common
                             subquestions.GetSubQuestionsByQuestionID(questionsMain.QuestionID);
                             for (int m = 0; m < subquestions.RowCount; m++)
                             {
-                                rows.Add(new item() { text = lang == "en" ? subquestions.EnTitle : subquestions.ArTitle, value = subquestions.QuestionID.ToString() });
+                                rows.Add(new item() { text = GetLocalizedText(lang, subquestions.EnTitle, subquestions.ArTitle), value = subquestions.QuestionID.ToString() });
                                 subquestions.MoveNext();
                             }
                             surveyJson.pages[pageCount].questions.Add(
@@ -1000,7 +1007,7 @@ namespace GrowSurv.common
                                 type = qtype,
                                 isRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
                                 isAllRowRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
-                                title = lang == "en" ? questionsMain.EnTitle : questionsMain.ArTitle,
+                                title = GetLocalizedText(lang, questionsMain.EnTitle, questionsMain.ArTitle),
                                 rows = rows,
                                 columns = columns,
                                 visibleIf = questionsMain.IsColumnNull("PQuestionID") ? "" : "{" + questionsMain.GetColumn("PQuestionID").ToString() + "} = '" + questionsMain.GetColumn("AnswerID") + "'"
