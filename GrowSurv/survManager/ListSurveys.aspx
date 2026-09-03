@@ -81,7 +81,7 @@
                                     <td>{{item.ExpiryDate | date : 'dd/MM/yyyy' }}</td>
                                     <td>
                                         <a href="javascript:;" class="btn blue" ng-click="EditSurvey(item.SurveyID)"><i class="fa fa-edit"></i>Edit </a>
-                                        <a href="javascript:;" class="btn red" ng-click="deleteSurvey(item.SurveyID)"><i class="fa fa-trash"></i>Delete </a>
+                                        <a href="javascript:;" class="btn red" ng-class="{'disabled': SurveyActionStatus.IsRunning}" ng-click="deleteSurvey(item.SurveyID)"><i class="fa fa-trash" ng-hide="isSurveyActionRunning(item.SurveyID, 'delete')"></i><i class="fa fa-spinner fa-spin" ng-show="isSurveyActionRunning(item.SurveyID, 'delete')"></i>Delete </a>
                                         <a href="javascript:;" ng-show="!item.IsPublic" class="btn green" ng-click="PublishSurvey(item.SurveyID)"><i class="fa fa-send"></i>Publish 
                                              <i class="fa fa-spinner fa-spin" ng-show="PublishStatus.PublishingToAll && PublishStatus.SurveyID == item.SurveyID"></i>
                                         </a>
@@ -96,8 +96,8 @@
                                                         <a href="javascript:;" ng-click="ViewReports(item.SurveyID)"><i class="fa fa-dashboard"></i>Reports </a>
                                                     </li>
                                                     <li>
-                                                        <a href="javascript:;" ng-click="DuplicateSurvey(item.SurveyID)">
-                                                            <i class="fa fa-copy"></i>Duplicate Survey </a>
+                                                        <a href="javascript:;" ng-class="{'disabled': SurveyActionStatus.IsRunning}" ng-click="DuplicateSurvey(item.SurveyID)">
+                                                            <i class="fa fa-copy" ng-hide="isSurveyActionRunning(item.SurveyID, 'duplicate')"></i><i class="fa fa-spinner fa-spin" ng-show="isSurveyActionRunning(item.SurveyID, 'duplicate')"></i>Duplicate Survey </a>
                                                     </li>
                                                     <%--                                                <li>
                                                     <a href="javascript:;">

@@ -29,6 +29,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.SurveyTypes = [];
     $scope.EditMode = false;
     $scope.PublishStatus = { PublishingToMember: false, PublishingToAll: false, MemberID: 0, SurveyID: 0 };
+    $scope.SurveyActionStatus = { IsRunning: false, SurveyID: 0, Action: "" };
 
     $scope.ConList = [];
     $scope.GovList = [];
@@ -200,10 +201,77 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
     $scope.ViewReports = function (SurveyID) {
         window.location.href = "/survManager/reports.aspx?sid=" + SurveyID;
     }
+
+    function getSurveyActionText(action, isLongRunning) {
+        var verb = action === "delete" ? "Deleting" : "Duplicating";
+        var description = action === "delete" ? "Deleting survey" : "Duplicating survey";
+
+        if (isLongRunning) {
+            return {
+                title: "Still " + verb.toLowerCase() + "...",
+                text: description + " is still running. This can take 5 to 10 minutes for large surveys. Please keep this page open."
+            };
+        }
+
+        return {
+            title: verb + " survey...",
+            text: "Please wait while the survey data is being processed."
+        };
+    }
+
+    function showSurveyActionLoader(action, isLongRunning) {
+        var message = getSurveyActionText(action, isLongRunning);
+
+        swal({
+            title: message.title,
+            html: '<div style="font-size: 30px; margin-bottom: 12px;"><i class="fa fa-spinner fa-spin"></i></div><div>' + message.text + '</div>',
+            type: "info",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false
+        });
+    }
+
+    function beginSurveyAction(surveyID, action) {
+        $scope.SurveyActionStatus.IsRunning = true;
+        $scope.SurveyActionStatus.SurveyID = surveyID;
+        $scope.SurveyActionStatus.Action = action;
+        showSurveyActionLoader(action, false);
+
+        return setTimeout(function () {
+            showSurveyActionLoader(action, true);
+        }, 20000);
+    }
+
+    function finishSurveyAction(timeoutHandle) {
+        if (timeoutHandle) {
+            clearTimeout(timeoutHandle);
+        }
+
+        $scope.SurveyActionStatus.IsRunning = false;
+        $scope.SurveyActionStatus.SurveyID = 0;
+        $scope.SurveyActionStatus.Action = "";
+        swal.close();
+    }
+
+    $scope.isSurveyActionRunning = function (surveyID, action) {
+        return $scope.SurveyActionStatus.IsRunning
+            && $scope.SurveyActionStatus.SurveyID === surveyID
+            && $scope.SurveyActionStatus.Action === action;
+    };
+
     $scope.deleteSurvey = function (surveyID) {
+        if ($scope.SurveyActionStatus.IsRunning) {
+            return;
+        }
+
         $rootScope.$emit("swConfirmDelete", {
             function() {
+                var loaderTimeout = beginSurveyAction(surveyID, "delete");
+
                 $http.post("/common/common.asmx/DeleteSurvey", { SurveyID: surveyID }).then(function (Result) {
+                    finishSurveyAction(loaderTimeout);
+
                     if (Result.data && Result.data.success === true) {
                         $rootScope.$emit("swAlertSave", {});
                         $scope.getAllSurveys();
@@ -214,13 +282,22 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                         $rootScope.$emit("swAlertError", {});
                     }
                 }, function () {
+                    finishSurveyAction(loaderTimeout);
                     $rootScope.$emit("swAlertError", {});
                 });
             }
         });
     }
     $scope.DuplicateSurvey = function (surveyID) {
+        if ($scope.SurveyActionStatus.IsRunning) {
+            return;
+        }
+
+        var loaderTimeout = beginSurveyAction(surveyID, "duplicate");
+
         $http.post("/common/common.asmx/DuplicateSurvey", { SurveyID: surveyID }).then(function (Result) {
+            finishSurveyAction(loaderTimeout);
+
             if (Result.data === true) {
                 $rootScope.$emit("swAlertSave", {});
                 $scope.getAllSurveys();
@@ -229,6 +306,7 @@ app.controller('SurveyController', function ($scope, $http, $rootScope) {
                 $rootScope.$emit("swAlertError", {});
             }
         }, function () {
+            finishSurveyAction(loaderTimeout);
             $rootScope.$emit("swAlertError", {});
         });
     }
