@@ -355,15 +355,62 @@ namespace GrowSurv.common
                     {
                         SurveyDepartment NewSurveyDepartment = new SurveyDepartment();
                         NewSurveyDepartment.AddNew();
-
                         NewSurveyDepartment.SurveyID = NewSurvey.SurveyID;
                         NewSurveyDepartment.DepartmentID = OldSurveyDepartment.DepartmentID;
                         NewSurveyDepartment.Weight = OldSurveyDepartment.IsColumnNull("Weight") ? 0 : OldSurveyDepartment.Weight;
                         NewSurveyDepartment.Save();
-
                         OldSurveyDepartment.MoveNext();
                     }
                 }
+
+                Dictionary<int, int> categoryIdMap = new Dictionary<int, int>();
+                QuestionCategory OldQuestionCategory = new QuestionCategory();
+                OldQuestionCategory.Where.SureveyID.Value = SurveyID;
+                OldQuestionCategory.Where.SureveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                OldQuestionCategory.Query.Load();
+
+                if (OldQuestionCategory.RowCount > 0)
+                {
+                    OldQuestionCategory.Rewind();
+                    for (int i = 0; i < OldQuestionCategory.RowCount; i++)
+                    {
+                        QuestionCategory NewQuestionCategory = new QuestionCategory();
+                        NewQuestionCategory.AddNew();
+                        NewQuestionCategory.ArName = OldQuestionCategory.IsColumnNull("ArName") ? string.Empty : OldQuestionCategory.ArName;
+                        NewQuestionCategory.EnName = OldQuestionCategory.IsColumnNull("EnName") ? string.Empty : OldQuestionCategory.EnName;
+                        NewQuestionCategory.SureveyID = NewSurvey.SurveyID;
+                        NewQuestionCategory.Save();
+                        categoryIdMap[OldQuestionCategory.CategoryID] = NewQuestionCategory.CategoryID;
+                        OldQuestionCategory.MoveNext();
+                    }
+                }
+
+                Dictionary<int, int> branchIdMap = new Dictionary<int, int>();
+                QuestionBranch OldQuestionBranch = new QuestionBranch();
+                OldQuestionBranch.Where.SurveyID.Value = SurveyID;
+                OldQuestionBranch.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+                OldQuestionBranch.Query.Load();
+
+                if (OldQuestionBranch.RowCount > 0)
+                {
+                    OldQuestionBranch.Rewind();
+                    for (int i = 0; i < OldQuestionBranch.RowCount; i++)
+                    {
+                        QuestionBranch NewQuestionBranch = new QuestionBranch();
+                        NewQuestionBranch.AddNew();
+                        NewQuestionBranch.ArName = OldQuestionBranch.IsColumnNull("ArName") ? string.Empty : OldQuestionBranch.ArName;
+                        NewQuestionBranch.EnName = OldQuestionBranch.IsColumnNull("EnName") ? string.Empty : OldQuestionBranch.EnName;
+                        NewQuestionBranch.SurveyID = NewSurvey.SurveyID;
+                        NewQuestionBranch.Save();
+                        branchIdMap[OldQuestionBranch.QuestionBranchID] = NewQuestionBranch.QuestionBranchID;
+                        OldQuestionBranch.MoveNext();
+                    }
+                }
+
+                Dictionary<int, int> questionIdMap = new Dictionary<int, int>();
+                List<Tuple<int, int>> questionParentLinks = new List<Tuple<int, int>>();
+                List<Tuple<int, int>> answerNextQuestionLinks = new List<Tuple<int, int>>();
+                List<Tuple<int, int>> answerNextBranchLinks = new List<Tuple<int, int>>();
 
                 Question OldQuestion = new Question();
                 OldQuestion.Where.SurveyID.Value = OldSurvey.SurveyID;
@@ -377,15 +424,25 @@ namespace GrowSurv.common
                     {
                         Question NewQuestion = new Question();
                         NewQuestion.AddNew();
-
                         NewQuestion.SurveyID = NewSurvey.SurveyID;
-                        NewQuestion.QuestionTypeID = OldQuestion.QuestionTypeID;
+                        if (OldQuestion.IsColumnNull("QuestionTypeID"))
+                            NewQuestion.SetColumnNull("QuestionTypeID");
+                        else
+                            NewQuestion.QuestionTypeID = OldQuestion.QuestionTypeID;
                         NewQuestion.ArTitle = OldQuestion.IsColumnNull("ArTitle") ? string.Empty : OldQuestion.ArTitle;
                         NewQuestion.EnTitle = OldQuestion.IsColumnNull("EnTitle") ? string.Empty : OldQuestion.EnTitle;
                         NewQuestion.IsMandatory = OldQuestion.IsColumnNull("IsMandatory") ? false : OldQuestion.IsMandatory;
                         NewQuestion.Weight = OldQuestion.IsColumnNull("Weight") ? 0 : OldQuestion.Weight;
                         NewQuestion.QuestionOrder = OldQuestion.IsColumnNull("QuestionOrder") ? 0 : OldQuestion.QuestionOrder;
+
+                        if (!OldQuestion.IsColumnNull("QuestionCatergoryID") && categoryIdMap.ContainsKey(OldQuestion.QuestionCatergoryID))
+                            NewQuestion.QuestionCatergoryID = categoryIdMap[OldQuestion.QuestionCatergoryID];
+                        if (!OldQuestion.IsColumnNull("QuestionBranchID") && branchIdMap.ContainsKey(OldQuestion.QuestionBranchID))
+                            NewQuestion.QuestionBranchID = branchIdMap[OldQuestion.QuestionBranchID];
                         NewQuestion.Save();
+                        questionIdMap[OldQuestion.QuestionID] = NewQuestion.QuestionID;
+                        if (!OldQuestion.IsColumnNull("ParentQuestionID"))
+                            questionParentLinks.Add(new Tuple<int, int>(NewQuestion.QuestionID, OldQuestion.ParentQuestionID));
 
                         Answer OldAnswer = new Answer();
                         OldAnswer.Where.QuestionID.Value = OldQuestion.QuestionID;
@@ -404,6 +461,12 @@ namespace GrowSurv.common
                                 NewAnswer.QuestionID = NewQuestion.QuestionID;
                                 NewAnswer.Weight = OldAnswer.IsColumnNull("Weight") ? 0 : OldAnswer.Weight;
                                 NewAnswer.Save();
+
+                                if (!OldAnswer.IsColumnNull("NextQuestionID"))
+                                    answerNextQuestionLinks.Add(new Tuple<int, int>(NewAnswer.AnswerID, OldAnswer.NextQuestionID));
+                                if (!OldAnswer.IsColumnNull("NextBranchID"))
+                                    answerNextBranchLinks.Add(new Tuple<int, int>(NewAnswer.AnswerID, OldAnswer.NextBranchID));
+
                                 OldAnswer.MoveNext();
                             }
                         }
@@ -412,43 +475,41 @@ namespace GrowSurv.common
                     }
                 }
 
-                QuestionCategory OldQuestionCategory = new QuestionCategory();
-                OldQuestionCategory.Where.SureveyID.Value = SurveyID;
-                OldQuestionCategory.Where.SureveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-                OldQuestionCategory.Query.Load();
-
-                if (OldQuestionCategory.RowCount > 0)
+                foreach (Tuple<int, int> link in questionParentLinks)
                 {
-                    OldQuestionCategory.Rewind();
-                    for (int i = 0; i < OldQuestionCategory.RowCount; i++)
+                    if (!questionIdMap.ContainsKey(link.Item2))
+                        continue;
+
+                    Question NewQuestion = new Question();
+                    if (NewQuestion.LoadByPrimaryKey(link.Item1))
                     {
-                        QuestionCategory NewQuestionCategory = new QuestionCategory();
-                        NewQuestionCategory.AddNew();
-                        NewQuestionCategory.ArName = OldQuestionCategory.IsColumnNull("ArName") ? string.Empty : OldQuestionCategory.ArName;
-                        NewQuestionCategory.EnName = OldQuestionCategory.IsColumnNull("EnName") ? string.Empty : OldQuestionCategory.EnName;
-                        NewQuestionCategory.SureveyID = NewSurvey.SurveyID;
-                        NewQuestionCategory.Save();
-                        OldQuestionCategory.MoveNext();
+                        NewQuestion.ParentQuestionID = questionIdMap[link.Item2];
+                        NewQuestion.Save();
+                    }
+                }
+                foreach (Tuple<int, int> link in answerNextQuestionLinks)
+                {
+                    if (!questionIdMap.ContainsKey(link.Item2))
+                        continue;
+
+                    Answer NewAnswer = new Answer();
+                    if (NewAnswer.LoadByPrimaryKey(link.Item1))
+                    {
+                        NewAnswer.NextQuestionID = questionIdMap[link.Item2];
+                        NewAnswer.Save();
                     }
                 }
 
-                QuestionBranch OldQuestionBranch = new QuestionBranch();
-                OldQuestionBranch.Where.SurveyID.Value = SurveyID;
-                OldQuestionBranch.Where.SurveyID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
-                OldQuestionBranch.Query.Load();
-
-                if (OldQuestionBranch.RowCount > 0)
+                foreach (Tuple<int, int> link in answerNextBranchLinks)
                 {
-                    OldQuestionBranch.Rewind();
-                    for (int i = 0; i < OldQuestionBranch.RowCount; i++)
+                    if (!branchIdMap.ContainsKey(link.Item2))
+                        continue;
+
+                    Answer NewAnswer = new Answer();
+                    if (NewAnswer.LoadByPrimaryKey(link.Item1))
                     {
-                        QuestionBranch NewQuestionBranch = new QuestionBranch();
-                        NewQuestionBranch.AddNew();
-                        NewQuestionBranch.ArName = OldQuestionBranch.IsColumnNull("ArName") ? string.Empty : OldQuestionBranch.ArName;
-                        NewQuestionBranch.EnName = OldQuestionBranch.IsColumnNull("EnName") ? string.Empty : OldQuestionBranch.EnName;
-                        NewQuestionBranch.SurveyID = NewSurvey.SurveyID;
-                        NewQuestionBranch.Save();
-                        OldQuestionBranch.MoveNext();
+                        NewAnswer.NextBranchID = branchIdMap[link.Item2];
+                        NewAnswer.Save();
                     }
                 }
 
@@ -459,7 +520,6 @@ namespace GrowSurv.common
                 SetContentResult(false);
             }
         }
-
         [WebMethod]
         public void DeleteSurvey(int SurveyID)
         {
@@ -1253,7 +1313,10 @@ namespace GrowSurv.common
             Question newQuestion = new Question();
             newQuestion.AddNew();
             newQuestion.SurveyID = NewSurveyID;
-            newQuestion.QuestionTypeID = originalQuestion.QuestionTypeID;
+            if (originalQuestion.IsColumnNull("QuestionTypeID"))
+                newQuestion.SetColumnNull("QuestionTypeID");
+            else
+                newQuestion.QuestionTypeID = originalQuestion.QuestionTypeID;
             newQuestion.ArTitle = originalQuestion.ArTitle;
             newQuestion.EnTitle = originalQuestion.EnTitle;
             newQuestion.IsMandatory = originalQuestion.IsColumnNull("IsMandatory") ? false : originalQuestion.IsMandatory;
@@ -1403,12 +1466,23 @@ namespace GrowSurv.common
             Question newQuestion = new Question();
             newQuestion.AddNew();
             newQuestion.SurveyID = originalQuestion.SurveyID;
-            newQuestion.QuestionTypeID = originalQuestion.QuestionTypeID;
+            if (originalQuestion.IsColumnNull("QuestionTypeID"))
+                newQuestion.SetColumnNull("QuestionTypeID");
+            else
+                newQuestion.QuestionTypeID = originalQuestion.QuestionTypeID;
             newQuestion.ArTitle = originalQuestion.ArTitle + " (مكرر)";
             newQuestion.EnTitle = originalQuestion.EnTitle + " (Duplicated)";
             newQuestion.IsMandatory = originalQuestion.IsColumnNull("IsMandatory") ? false : originalQuestion.IsMandatory;
             newQuestion.Weight = originalQuestion.IsColumnNull("Weight") ? 0 : originalQuestion.Weight;
             newQuestion.QuestionOrder = originalQuestion.IsColumnNull("QuestionOrder") ? 0 : originalQuestion.QuestionOrder;
+
+            if (!originalQuestion.IsColumnNull("QuestionCatergoryID"))
+                newQuestion.QuestionCatergoryID = originalQuestion.QuestionCatergoryID;
+            if (!originalQuestion.IsColumnNull("QuestionBranchID"))
+                newQuestion.QuestionBranchID = originalQuestion.QuestionBranchID;
+            if (!originalQuestion.IsColumnNull("ParentQuestionID"))
+                newQuestion.ParentQuestionID = originalQuestion.ParentQuestionID;
+
             newQuestion.Save();
 
             // Importing Question Answers
@@ -1432,8 +1506,33 @@ namespace GrowSurv.common
                     originalAnswer.MoveNext();
                 }
             }
-        }
 
+            // Importing Sub-Questions
+            Question originalSubQuestion = new Question();
+            originalSubQuestion.Where.ParentQuestionID.Value = QuestionID;
+            originalSubQuestion.Where.ParentQuestionID.Operator = MyGeneration.dOOdads.WhereParameter.Operand.Equal;
+            originalSubQuestion.Query.Load();
+
+            if (originalSubQuestion.RowCount > 0)
+            {
+                originalSubQuestion.Rewind();
+                for (int i = 0; i < originalSubQuestion.RowCount; i++)
+                {
+                    Question newSubQuestion = new Question();
+                    newSubQuestion.AddNew();
+                    newSubQuestion.SurveyID = originalQuestion.SurveyID;
+                    newSubQuestion.ParentQuestionID = newQuestion.QuestionID;
+                    newSubQuestion.ArTitle = originalSubQuestion.ArTitle;
+                    newSubQuestion.EnTitle = originalSubQuestion.EnTitle;
+                    newSubQuestion.IsMandatory = originalSubQuestion.IsColumnNull("IsMandatory") ? false : originalSubQuestion.IsMandatory;
+                    newSubQuestion.Weight = originalSubQuestion.IsColumnNull("Weight") ? 0 : originalSubQuestion.Weight;
+                    newSubQuestion.Save();
+                    originalSubQuestion.MoveNext();
+                }
+            }
+
+            SetContentResult(true);
+        }
 
 
         #endregion
