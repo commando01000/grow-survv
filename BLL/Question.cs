@@ -48,6 +48,13 @@ namespace GrowSurv.BLL
             return LoadFromSql("GetSurveyQuestionsByBranchIDAndSurveyIDAndCategoryID", parameters);
         }
 
+        public virtual bool GetSurveyQuestionsBySurveyID(int surveyID)
+        {
+            ListDictionary parameters = new ListDictionary();
+            parameters.Add(new SqlParameter("@SurveyID", SqlDbType.Int, 0), surveyID);
+            return LoadFromSql("GetSurveyQuestionsBySurveyID", parameters);
+        }
+
         
 
         public virtual bool GetSurveyQuestionsByBranchID(int BranchID)

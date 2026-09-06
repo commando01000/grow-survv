@@ -870,7 +870,10 @@ namespace GrowSurv.common
             else
                 survs.SetColumnNull("QuestionTypeID");
 
-            survs.IsMandatory = model.IsMandatory;
+            if (model.IsMandatory.HasValue)
+                survs.IsMandatory = model.IsMandatory.Value;
+            else if (model.QuestionID == 0)
+                survs.IsMandatory = false;
 
             survs.Weight = model.Weight;
             if (model.CategoryID != 0)
@@ -1009,82 +1012,91 @@ namespace GrowSurv.common
 
             QuestionCategory Categories = new QuestionCategory();
             Categories.GetSurveyCategoriesBySurveyID(SurveyID);
-            int pageCount = -1;
+            Dictionary<int, string> categoryTitles = new Dictionary<int, string>();
             for (int j = 0; j < Categories.RowCount; j++)
             {
-                surveyJson.pages.Add(new PageJson() { name = GetLocalizedText(lang, Categories.EnName, Categories.ArName), title = GetLocalizedText(lang, Categories.EnName, Categories.ArName), questions = new List<QuestionJson>(), visibleIf = "", navigationButtonsVisibility = "show" });
-                pageCount++;
-                Question questionsMain = new Question();
-                questionsMain.GetSurveyQuestionsBySurveyIDAndCategoryID(SurveyID, Categories.CategoryID);
-                for (int i = 0; i < questionsMain.RowCount; i++)
-                {
-                    string qtype = "";
-                    List<item> answersJson = new List<item>();
-                    List<item> rows = new List<item>();
-                    List<item> columns = new List<item>();
-                    Answer answers = new Answer();
-                    answers.getAnswersByQuestionID(questionsMain.QuestionID);
-                    for (int k = 0; k < answers.RowCount; k++)
-                    {
-                        answersJson.Add(new item { text = GetLocalizedText(lang, answers.EnName, answers.ArName), value = answers.AnswerID.ToString() });
-                        columns.Add(new item() { text = GetLocalizedText(lang, answers.EnName, answers.ArName), value = answers.AnswerID.ToString() });
-                        answers.MoveNext();
-                    }
-
-                    switch (questionsMain.QuestionTypeID)
-                    {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                            if (questionsMain.QuestionTypeID == 1) qtype = "text";
-                            if (questionsMain.QuestionTypeID == 2) qtype = "radiogroup";
-                            if (questionsMain.QuestionTypeID == 3) qtype = "checkbox";
-                            if (questionsMain.QuestionTypeID == 4) qtype = "dropdown";
-                            surveyJson.pages[pageCount].questions.Add(
-                            new QuestionJson()
-                            {
-                                name = questionsMain.QuestionID.ToString(),
-                                type = qtype,
-                                isRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
-                                title = GetLocalizedText(lang, questionsMain.EnTitle, questionsMain.ArTitle),
-                                choices = answersJson,
-                                visibleIf = questionsMain.IsColumnNull("PQuestionID") ? "" : "{" + questionsMain.GetColumn("PQuestionID").ToString() + "} = '" + questionsMain.GetColumn("AnswerID") + "'"
-                            });
-                            break;
-                        case 5:
-                            qtype = "matrix";
-                            Question subquestions = new Question();
-                            subquestions.GetSubQuestionsByQuestionID(questionsMain.QuestionID);
-                            for (int m = 0; m < subquestions.RowCount; m++)
-                            {
-                                rows.Add(new item() { text = GetLocalizedText(lang, subquestions.EnTitle, subquestions.ArTitle), value = subquestions.QuestionID.ToString() });
-                                subquestions.MoveNext();
-                            }
-                            surveyJson.pages[pageCount].questions.Add(
-                            new QuestionJson()
-                            {
-                                name = questionsMain.QuestionID.ToString(),
-                                type = qtype,
-                                isRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
-                                isAllRowRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
-                                title = GetLocalizedText(lang, questionsMain.EnTitle, questionsMain.ArTitle),
-                                rows = rows,
-                                columns = columns,
-                                visibleIf = questionsMain.IsColumnNull("PQuestionID") ? "" : "{" + questionsMain.GetColumn("PQuestionID").ToString() + "} = '" + questionsMain.GetColumn("AnswerID") + "'"
-
-                            });
-                            break;
-                        default:
-                            break;
-                    }
-
-                    questionsMain.MoveNext();
-                }
+                categoryTitles[Categories.CategoryID] = GetLocalizedText(lang, Categories.EnName, Categories.ArName);
                 Categories.MoveNext();
-
             }
 
+            int pageCount = -1;
+            int previousCategoryID = -1;
+            Question questionsMain = new Question();
+            questionsMain.GetSurveyQuestionsBySurveyID(SurveyID);
+            for (int i = 0; i < questionsMain.RowCount; i++)
+            {
+                int currentCategoryID = questionsMain.IsColumnNull("QuestionCatergoryID") ? 0 : questionsMain.QuestionCatergoryID;
+                if (pageCount == -1 || currentCategoryID != previousCategoryID)
+                {
+                    pageCount++;
+                    previousCategoryID = currentCategoryID;
+                    string pageTitle = categoryTitles.ContainsKey(currentCategoryID) ? categoryTitles[currentCategoryID] : string.Empty;
+                    surveyJson.pages.Add(new PageJson() { name = "page" + pageCount, title = pageTitle, questions = new List<QuestionJson>(), visibleIf = "", navigationButtonsVisibility = "show" });
+                }
+
+                string qtype = "";
+                List<item> answersJson = new List<item>();
+                List<item> rows = new List<item>();
+                List<item> columns = new List<item>();
+                Answer answers = new Answer();
+                answers.getAnswersByQuestionID(questionsMain.QuestionID);
+                for (int k = 0; k < answers.RowCount; k++)
+                {
+                    answersJson.Add(new item { text = GetLocalizedText(lang, answers.EnName, answers.ArName), value = answers.AnswerID.ToString() });
+                    columns.Add(new item() { text = GetLocalizedText(lang, answers.EnName, answers.ArName), value = answers.AnswerID.ToString() });
+                    answers.MoveNext();
+                }
+
+                switch (questionsMain.QuestionTypeID)
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        if (questionsMain.QuestionTypeID == 1) qtype = "text";
+                        if (questionsMain.QuestionTypeID == 2) qtype = "radiogroup";
+                        if (questionsMain.QuestionTypeID == 3) qtype = "checkbox";
+                        if (questionsMain.QuestionTypeID == 4) qtype = "dropdown";
+                        surveyJson.pages[pageCount].questions.Add(
+                        new QuestionJson()
+                        {
+                            name = questionsMain.QuestionID.ToString(),
+                            type = qtype,
+                            isRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
+                            title = GetLocalizedText(lang, questionsMain.EnTitle, questionsMain.ArTitle),
+                            choices = answersJson,
+                            visibleIf = questionsMain.IsColumnNull("PQuestionID") ? "" : "{" + questionsMain.GetColumn("PQuestionID").ToString() + "} = '" + questionsMain.GetColumn("AnswerID") + "'"
+                        });
+                        break;
+                    case 5:
+                        qtype = "matrix";
+                        Question subquestions = new Question();
+                        subquestions.GetSubQuestionsByQuestionID(questionsMain.QuestionID);
+                        for (int m = 0; m < subquestions.RowCount; m++)
+                        {
+                            rows.Add(new item() { text = GetLocalizedText(lang, subquestions.EnTitle, subquestions.ArTitle), value = subquestions.QuestionID.ToString() });
+                            subquestions.MoveNext();
+                        }
+                        surveyJson.pages[pageCount].questions.Add(
+                        new QuestionJson()
+                        {
+                            name = questionsMain.QuestionID.ToString(),
+                            type = qtype,
+                            isRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
+                            isAllRowRequired = questionsMain.IsColumnNull("IsMandatory") ? false : questionsMain.IsMandatory,
+                            title = GetLocalizedText(lang, questionsMain.EnTitle, questionsMain.ArTitle),
+                            rows = rows,
+                            columns = columns,
+                            visibleIf = questionsMain.IsColumnNull("PQuestionID") ? "" : "{" + questionsMain.GetColumn("PQuestionID").ToString() + "} = '" + questionsMain.GetColumn("AnswerID") + "'"
+
+                        });
+                        break;
+                    default:
+                        break;
+                }
+
+                questionsMain.MoveNext();
+            }
 
             SurveyMember mem = new SurveyMember();
             mem.GetMemberBySurveyIDAndMemberEmail(SurveyID, memberMail);
@@ -1125,11 +1137,17 @@ namespace GrowSurv.common
                         Survey checksurveyData = new Survey();
                         checksurveyData.GetSurveyDataAnswersBySurveyIDAndMemberIDAndQuestionID(SurveyID, mem.MemberID, int.Parse(surveyData.GetColumn("QuestionID").ToString()));
 
+                        int checkedAnswerCount = 0;
                         for (int k = 0; k < checksurveyData.RowCount; k++)
                         {
-                            if (k > 0)
-                                dataObject += ",";
-                            dataObject += "\"" + checksurveyData.GetColumn("AnswerID").ToString() + "\"";
+                            string answerID = checksurveyData.GetColumn("AnswerID").ToString();
+                            if (!string.IsNullOrEmpty(answerID))
+                            {
+                                if (checkedAnswerCount > 0)
+                                    dataObject += ",";
+                                dataObject += "\"" + answerID + "\"";
+                                checkedAnswerCount++;
+                            }
                             checksurveyData.MoveNext();
                         }
                         dataObject += "]";
@@ -3237,9 +3255,3 @@ namespace GrowSurv.common
         }
     }
 }
-
-
-
-
-
-

@@ -17,7 +17,7 @@ namespace GrowSurv.Models
         public int SurveyID { get; set; }
         public int ParentQuestionID { get; set; }
         public int QuestionTypeID { get; set; }
-        public bool IsMandatory { get; set; }
+        public bool? IsMandatory { get; set; }
         public string QuestionTypeName { get; set; }
     }
 }
