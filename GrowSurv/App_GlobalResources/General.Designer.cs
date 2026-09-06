@@ -19,7 +19,7 @@ namespace Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option or rebuild the Visual Studio project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Web.Application.StronglyTypedResourceProxyBuilder", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Web.Application.StronglyTypedResourceProxyBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class General {
@@ -61,16 +61,15 @@ namespace Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;
-        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+        ///   Looks up a localized string similar to  &lt;!DOCTYPE html&gt;
+        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; lang=&quot;en&quot;&gt;
         ///&lt;head&gt;
         ///    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
-        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;/&gt;    
-        ///
-        ///    &lt;style type=&quot;text/css&quot;&gt;
-        ///    * {{ margin: 0; padding: 0; font-size: 100%; font-family: &apos;Avenir Next&apos;, &quot;Helvetica Neue&quot;, &quot;Helvetica&quot;, Helvetica, Arial, sans-serif; line-height: 1.65; }}
-        ///
-        ///img {{ max-width: [rest of string was truncated]&quot;;.
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+        ///    &lt;meta name=&quot;x-apple-disable-message-reformatting&quot; /&gt;
+        ///&lt;/head&gt;
+        ///&lt;body style=&quot;margin:0; padding:0; background-color:#eef4f2; font-family:Arial, Helvetica, sans-serif; color:#25313b;&quot;&gt;
+        ///    &lt;div style=&quot;display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;&quot;&gt;You have [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EmailTemplate {
             get {

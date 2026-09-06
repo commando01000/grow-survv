@@ -10,6 +10,7 @@
     <link href="../assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
     <link id="lnkCSS" runat="server" href="../assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="../assets/surveyplugin/survey.css" rel="stylesheet" />
+    <link href="../assets/global/css/sweetalert2.min.css" rel="stylesheet" />
     <style type="text/css">
         .progress {
             overflow: hidden;
@@ -331,6 +332,7 @@
         <script src="../assets/global/plugins/jquery.min.js" type="text/javascript"></script>
         <script src="../assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="../assets/surveyplugin/survey.jquery.min.js"></script>
+        <script src="../scripts/sweetalert2.min.js"></script>
 
         <script type="text/javascript">
             function getParameterByName(name, url) {
@@ -430,6 +432,58 @@
 
 
             });
+            var submitAlertStartedAt = 0;
+
+            function showSubmitLoading(isDraftSave) {
+                if (typeof swal !== "function")
+                    return;
+
+                submitAlertStartedAt = new Date().getTime();
+                var isEnglish = $('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en";
+                var message = isEnglish ? "Please wait while we save your responses." : "برجاء الانتظار حتى يتم حفظ إجاباتك.";
+                swal({
+                    title: isEnglish ? (isDraftSave ? "Saving survey..." : "Submitting survey...") : (isDraftSave ? "جاري حفظ الاستبيان..." : "جاري إرسال الاستبيان..."),
+                    html: '<i class="fa fa-spinner fa-spin fa-3x" style="color:#1ab394"></i><div style="margin-top:12px;">' + message + '</div>',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false
+                });
+            }
+
+            function showSubmitSuccess(isDraftSave) {
+                if (typeof swal !== "function")
+                    return;
+
+                var isEnglish = $('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en";
+                var elapsed = new Date().getTime() - submitAlertStartedAt;
+                var delay = Math.max(0, 700 - elapsed);
+                setTimeout(function () {
+                    swal({
+                        title: isEnglish ? (isDraftSave ? "Saved" : "Submitted") : (isDraftSave ? "تم الحفظ" : "تم الإرسال"),
+                        text: isEnglish ? (isDraftSave ? "Your survey progress has been saved." : "Your survey has been submitted successfully.") : (isDraftSave ? "تم حفظ تقدمك في الاستبيان." : "تم إرسال الاستبيان بنجاح."),
+                        type: "success",
+                        confirmButtonText: isEnglish ? "OK" : "حسناً"
+                    });
+                }, delay);
+            }
+
+            function showSubmitError(message) {
+                if (typeof swal !== "function")
+                    return false;
+
+                var isEnglish = $('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en";
+                var elapsed = new Date().getTime() - submitAlertStartedAt;
+                var delay = Math.max(0, 700 - elapsed);
+                setTimeout(function () {
+                    swal({
+                        title: isEnglish ? "Error" : "خطأ",
+                        text: message,
+                        type: "error",
+                        confirmButtonText: isEnglish ? "OK" : "حسناً"
+                    });
+                }, delay);
+                return true;
+            }
 
             function sendDataToServer(survey, IsSubmitted) {
                 survey.stopTimer();
@@ -465,6 +519,8 @@
                 if ($('#<%= uiTextBoxRecentPromotionDate.ClientID %>').val() != "")
                     recentPromotionDate = $('#<%= uiTextBoxRecentPromotionDate.ClientID %>').val();
 
+                showSubmitLoading(NotSubmitted);
+
                 $.ajax({
                     type: 'POST',
                     url: '../common/common.asmx/submitDemographicData',
@@ -481,15 +537,23 @@
                         data: JSON.stringify({ SurveyID: surveyid, member: membermail, surveydata: survey.data, IsSubmitted: !NotSubmitted }),
                         contentType: 'application/json',
                         dataType: 'json'
+                    }).done(function () {
+                        showSubmitSuccess(NotSubmitted);
                     }).fail(function () {
-                        $('#modalTitle').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Error" : "خطأ");
-                        $('#modalText').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Could not save survey answers. Please try again." : "تعذر حفظ إجابات الاستبيان. من فضلك حاول مرة أخرى.");
-                        $("#myModal").modal();
+                        var message = $('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Could not save survey answers. Please try again." : "تعذر حفظ إجابات الاستبيان. من فضلك حاول مرة أخرى.";
+                        if (!showSubmitError(message)) {
+                            $('#modalTitle').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Error" : "خطأ");
+                            $('#modalText').html(message);
+                            $("#myModal").modal();
+                        }
                     });
                 }).fail(function () {
-                    $('#modalTitle').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Error" : "خطأ");
-                    $('#modalText').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Could not save demographic data. Please try again." : "تعذر حفظ البيانات الديموغرافية. من فضلك حاول مرة أخرى.");
-                    $("#myModal").modal();
+                    var message = $('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Could not save demographic data. Please try again." : "تعذر حفظ البيانات الديموغرافية. من فضلك حاول مرة أخرى.";
+                    if (!showSubmitError(message)) {
+                        $('#modalTitle').html($('#<%= uiHiddenFieldCurrentLang.ClientID %>').val() == "en" ? "Error" : "خطأ");
+                        $('#modalText').html(message);
+                        $("#myModal").modal();
+                    }
                 });
 
                 //$.post("../common/common.asmx/submitSurveyAsJson", { SurveyID: surveyid, member: membermail, surveydata: resultAsString }).done(function () {
