@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -12,12 +13,16 @@ namespace GrowSurv.survManager
 {
     public partial class doreport : System.Web.UI.Page
     {
+        private const int ReportTimeoutSeconds = 800;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 if (Request.QueryString["r"] != null)
                 {
+                    Server.ScriptTimeout = ReportTimeoutSeconds;
+
                     string lang = Request.QueryString["lang"].ToString() == "ar" ? "ar\\" : "";
                     ReportDataSource rds = new ReportDataSource();
 
@@ -27,60 +32,72 @@ namespace GrowSurv.survManager
                             ReportDataSource rds13 = new ReportDataSource();
                             rds13.Name = "ConDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForCountryTableAdapter conds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForCountryTableAdapter();
+                            SetTableAdapterCommandTimeout(conds);
                             conds.ClearBeforeFill = true;
 
                             rds.Name = "GovDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForGovernrateTableAdapter govds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForGovernrateTableAdapter();
+                            SetTableAdapterCommandTimeout(govds);
                             govds.ClearBeforeFill = true;
 
                             ReportDataSource rds2 = new ReportDataSource();
                             rds2.Name = "AreaDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForAreaTableAdapter Areads = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForAreaTableAdapter();
+                            SetTableAdapterCommandTimeout(Areads);
                             Areads.ClearBeforeFill = true;
 
                             ReportDataSource rds3 = new ReportDataSource();
                             rds3.Name = "BranchDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForBranchTableAdapter Branchds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForBranchTableAdapter();
+                            SetTableAdapterCommandTimeout(Branchds);
                             Branchds.ClearBeforeFill = true;
 
                             ReportDataSource rds4 = new ReportDataSource();
                             rds4.Name = "DeptDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForDepartmentTableAdapter Deptds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForDepartmentTableAdapter();
+                            SetTableAdapterCommandTimeout(Deptds);
                             Deptds.ClearBeforeFill = true;
 
                             ReportDataSource rds5 = new ReportDataSource();
                             rds5.Name = "DivDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForDivisionTableAdapter Divds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForDivisionTableAdapter();
+                            SetTableAdapterCommandTimeout(Divds);
                             Divds.ClearBeforeFill = true;
 
                             ReportDataSource rds6 = new ReportDataSource();
                             rds6.Name = "AgeDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForAgeGroupTableAdapter Ageds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForAgeGroupTableAdapter();
+                            SetTableAdapterCommandTimeout(Ageds);
                             Ageds.ClearBeforeFill = true;
 
                             ReportDataSource rds7 = new ReportDataSource();
                             rds7.Name = "GenderDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForGenderTableAdapter Genderds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForGenderTableAdapter();
+                            SetTableAdapterCommandTimeout(Genderds);
                             Genderds.ClearBeforeFill = true;
 
                             ReportDataSource rds8 = new ReportDataSource();
                             rds8.Name = "GradeDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForGradeTableAdapter Gradeds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForGradeTableAdapter();
+                            SetTableAdapterCommandTimeout(Gradeds);
                             Gradeds.ClearBeforeFill = true;
 
                             ReportDataSource rds9 = new ReportDataSource();
                             rds9.Name = "LevelDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForLevelTableAdapter Levelds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForLevelTableAdapter();
+                            SetTableAdapterCommandTimeout(Levelds);
                             Levelds.ClearBeforeFill = true;
 
                             ReportDataSource rds10 = new ReportDataSource();
                             rds10.Name = "JTDataSet";
                             GSDataSetTableAdapters.GetEngagementRateBySurveyIDForJobTitleTableAdapter Jtds = new GSDataSetTableAdapters.GetEngagementRateBySurveyIDForJobTitleTableAdapter();
+                            SetTableAdapterCommandTimeout(Jtds);
                             Jtds.ClearBeforeFill = true;
 
                             ReportDataSource rds11 = new ReportDataSource();
                             rds11.Name = "MembersDataSet";
                             GSDataSetTableAdapters.GetMembersCountBySurveyIDTableAdapter Membersds = new GSDataSetTableAdapters.GetMembersCountBySurveyIDTableAdapter();
+                            SetTableAdapterCommandTimeout(Membersds);
                             Membersds.ClearBeforeFill = true;
 
                             int surveyID_1 = 0;
@@ -123,6 +140,7 @@ namespace GrowSurv.survManager
                         case "7":
                             rds.Name = "GSDataSet";
                             GSDataSetTableAdapters.GetStatisticsBySurveyIDTableAdapter gsbysurveyID = new GSDataSetTableAdapters.GetStatisticsBySurveyIDTableAdapter();
+                            SetTableAdapterCommandTimeout(gsbysurveyID);
                             gsbysurveyID.ClearBeforeFill = true;
                             int surveyID = 0;
                             if (int.TryParse(Request.QueryString["sid"].ToString(), out surveyID))
@@ -138,6 +156,7 @@ namespace GrowSurv.survManager
                         case "3":
                             rds.Name = "GSDataSet";
                             GSDataSetTableAdapters.GetStatisticsBySurveyIDWithGroupingTableAdapter gsbysurveyIDByGroup = new GSDataSetTableAdapters.GetStatisticsBySurveyIDWithGroupingTableAdapter();
+                            SetTableAdapterCommandTimeout(gsbysurveyIDByGroup);
                             gsbysurveyIDByGroup.ClearBeforeFill = true;
                             int surveyIDByGroup = 0;
                             if (int.TryParse(Request.QueryString["sid"].ToString(), out surveyIDByGroup))
@@ -211,7 +230,9 @@ namespace GrowSurv.survManager
                             ReportViewer1.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(LocalReport_SubreportProcessing);
                             rds.Name = "SurveyDataSet";
                             GSDataSetTableAdapters.GetAllQuestionsAndAnswersBySurveyIDTableAdapter getall = new GSDataSetTableAdapters.GetAllQuestionsAndAnswersBySurveyIDTableAdapter();
+                            SetTableAdapterCommandTimeout(getall);
                             GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter getsub = new GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter();
+                            SetTableAdapterCommandTimeout(getsub);
                             getall.ClearBeforeFill = true;
                             int surveyIDGetAll = 0;
                             ReportDataSource rds12 = new ReportDataSource();
@@ -234,6 +255,7 @@ namespace GrowSurv.survManager
                         case "6":
                             rds.Name = "DetailsDataSet";
                             GSDataSetTableAdapters.GetSurveyAnswerDetailsBySurveyIDAndMemberIDTableAdapter gsabysurveyID = new GSDataSetTableAdapters.GetSurveyAnswerDetailsBySurveyIDAndMemberIDTableAdapter();
+                            SetTableAdapterCommandTimeout(gsabysurveyID);
                             gsabysurveyID.ClearBeforeFill = true;
                             int surveyID_ans = 0;
                             if (int.TryParse(Request.QueryString["sid"].ToString(), out surveyID_ans))
@@ -261,6 +283,7 @@ namespace GrowSurv.survManager
         private void LocalReport_SubreportProcessing_subQuestion(object sender, SubreportProcessingEventArgs e)
         {
             GSDataSetTableAdapters.GetSurveyAnswerDetailsBySurveyIDAndMemberID_SubQuestionsTableAdapter getsub = new GSDataSetTableAdapters.GetSurveyAnswerDetailsBySurveyIDAndMemberID_SubQuestionsTableAdapter();
+            SetTableAdapterCommandTimeout(getsub);
             ReportDataSource rds12 = new ReportDataSource();
             rds12.Name = "DetailedDataSet";
             rds12.Value = getsub.GetData(int.Parse(Request.QueryString["sid"].ToString()), int.Parse(e.Parameters["MemberID"].Values[0].ToString()));
@@ -270,6 +293,7 @@ namespace GrowSurv.survManager
         private void LocalReport_SubreportProcessing_Statistics(object sender, SubreportProcessingEventArgs e)
         {
             GSDataSetTableAdapters.GetSubQuestionsAnswersBySurveyIDTableAdapter getsub = new GSDataSetTableAdapters.GetSubQuestionsAnswersBySurveyIDTableAdapter();
+            SetTableAdapterCommandTimeout(getsub);
             ReportDataSource rds12 = new ReportDataSource();
             rds12.Name = "QuestionDataSet";
             rds12.Value = getsub.GetData(int.Parse(Request.QueryString["sid"].ToString()));
@@ -279,6 +303,7 @@ namespace GrowSurv.survManager
         private void LocalReport_SubreportProcessing(object sender, SubreportProcessingEventArgs e)
         {
             GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter getsub = new GSDataSetTableAdapters.GetSubQuestionsAndAnswersBySurveyIDTableAdapter();
+            SetTableAdapterCommandTimeout(getsub);
             ReportDataSource rds12 = new ReportDataSource();
             rds12.Name = "QuestionDataSet";
             rds12.Value = getsub.GetData(int.Parse(Request.QueryString["sid"].ToString()));
@@ -286,6 +311,28 @@ namespace GrowSurv.survManager
 
         }
 
+        private static void SetTableAdapterCommandTimeout(object tableAdapter)
+        {
+            if (tableAdapter == null)
+                return;
+
+            PropertyInfo commandCollectionProperty = tableAdapter.GetType().GetProperty(
+                "CommandCollection",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+            if (commandCollectionProperty == null)
+                return;
+
+            var commands = commandCollectionProperty.GetValue(tableAdapter, null) as System.Data.SqlClient.SqlCommand[];
+            if (commands == null)
+                return;
+
+            foreach (System.Data.SqlClient.SqlCommand command in commands)
+            {
+                if (command != null)
+                    command.CommandTimeout = ReportTimeoutSeconds;
+            }
+        }
         private static DataTable BuildGroupedStatisticsData(
             GSDataSet.GetStatisticsBySurveyIDWithGroupingDataTable source,
             string groupColumnName,
